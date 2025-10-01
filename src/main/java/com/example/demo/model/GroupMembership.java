@@ -19,11 +19,11 @@ public class GroupMembership {
 
     @ManyToOne(optional = false)
     @JoinColumn
-    private User user;
+    private CalendarUser user;
 
     @ManyToOne(optional = false)
     @JoinColumn
-    private Group group;
+    private UserGroup group;
 
     @Column(nullable = false)
     private MembershipType membershipType = MembershipType.MEMBER;
