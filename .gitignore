@@ -32,5 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /data/
-/src/main/node_modules/.package-lock.json
-/src/main/node_modules/react-dom/test-utils.js
+/src/main/node_modules/*
