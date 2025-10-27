@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import {http} from "../../requests/http.jsx";
+import {setAuthTokenProvider} from "../../requests/http.jsx";
 
 const AuthCtx = createContext(null);
 
@@ -10,13 +10,7 @@ export function AuthProvider({children}) {
     const [lastName, setLastName] = useState("")
 
     useEffect(() => {
-        if (token) {
-            http.interceptors.request.use((config) => {
-                const {token} = useAuth()
-                if (token) config.headers.Authorization = `Bearer ${token}`;
-                return config;
-            })
-        }
+        setAuthTokenProvider(() => token);
     }, [token])
 
     const value = useMemo(() => ({

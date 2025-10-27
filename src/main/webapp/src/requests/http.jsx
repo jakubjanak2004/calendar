@@ -1,11 +1,10 @@
 import axios from "axios";
 import {CONFIG} from "../constants.js";
-import {useAuth} from "../pages/auth/AuthContext.jsx";
 
 export const http = axios.create({
     baseURL: CONFIG.API_URL,
     timeout: CONFIG.TIMEOUT_MS,
-    // If your Spring Boot uses cookie-based auth/CSRF, enable this:
+    // If Spring Boot will be using cookie-based auth/CSRF, enable this:
     // withCredentials: true,
     headers: {
         "Content-Type": "application/json",
@@ -13,7 +12,18 @@ export const http = axios.create({
     },
 });
 
-// Optional: normalize errors
+let getToken = null;
+
+export function setAuthTokenProvider(fn) {
+    getToken = fn;
+}
+
+http.interceptors.request.use((cfg) => {
+    const token = getToken && getToken();
+    if (token) cfg.headers.Authorization = `Bearer ${token}`;
+    return cfg;
+});
+
 http.interceptors.response.use(
     (r) => r,
     (err) => {

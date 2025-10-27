@@ -5,7 +5,7 @@ import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
 import com.example.demo.exception.UsernameExistsException;
-import com.example.demo.mapper.CalendarUserMapper;
+import com.example.demo.mapper.CalendarUserSignupMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
     private final JwtProps jwtProps;
+    private final CalendarUserSignupMapper calendarUserSignupMapper;
 
     public AuthResponseDTO login(LoginDTO loginDTO) {
         Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
@@ -45,7 +46,7 @@ public class AuthService {
             throw new UsernameExistsException("Username already taken");
         }
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
-        CalendarUser calendarUser = CalendarUserMapper.toEntity(signupDTO);
+        CalendarUser calendarUser = calendarUserSignupMapper.toEntity(signupDTO);
         userRepository.save(calendarUser);
         String token = generateToken(calendarUser);
         return new AuthResponseDTO(token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());

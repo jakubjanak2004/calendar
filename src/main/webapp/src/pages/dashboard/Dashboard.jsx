@@ -1,5 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../auth/AuthContext.jsx";
+import {Calendar} from "./Calendar.jsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
@@ -16,5 +17,7 @@ export function Dashboard() {
         <h1>Dashboard</h1>
         <h2>username: {username}</h2>
         <h2>name: {firstName} {lastName}</h2>
+        <Calendar>
+        </Calendar>
     </>
 }
