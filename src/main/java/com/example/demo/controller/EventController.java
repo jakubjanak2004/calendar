@@ -32,6 +32,6 @@ public class EventController {
             @PathVariable Instant endInstant,
             Principal principal) {
         CalendarUser calendarUser = userRepository.findByUsername(principal.getName()).orElseThrow();
-        return eventService.getAllEventsInRange(startInstant, endInstant, calendarUser);
+        return ResponseEntity.ok(eventService.getAllEventsInRange(calendarUser, startInstant, endInstant));
     }
 }

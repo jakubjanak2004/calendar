@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,14 @@ import java.util.Random;
 public class Generator {
     private static final Random RANDOM = new Random();
     private final PasswordEncoder passwordEncoder;
+
+    public static String createStringAttribute(String attributeName) {
+        return attributeName + " " + RANDOM.nextDouble(0, 10);
+    }
+
+    public CalendarUser createUser() {
+        return createUser(createStringAttribute("password"));
+    }
 
     public CalendarUser createUser(String password) {
         return createUser(
@@ -48,13 +57,32 @@ public class Generator {
         ZonedDateTime now = ZonedDateTime.now(zone);
         ZonedDateTime startDateTime = now.plusDays(daysOffset);
         ZonedDateTime endDateTime = startDateTime.plusMinutes(eventDurationMinutes);
+        return createEvent(
+                eventOwner,
+                zone,
+                startDateTime.toInstant(),
+                endDateTime.toInstant()
+        );
+    }
+
+    public Event createEvent(EventOwner eventOwner, Instant startTime, Instant endTime) {
+        ZoneId zone = ZoneId.of("Europe/Prague");
+        return createEvent(
+                eventOwner,
+                zone,
+                startTime,
+                endTime
+        );
+    }
+
+    public Event createEvent(EventOwner eventOwner, ZoneId zone, Instant startTime, Instant endTime) {
         return new Event(
                 eventOwner,
                 createStringAttribute("title"),
                 createStringAttribute("description"),
                 zone,
-                startDateTime.toInstant(),
-                endDateTime.toInstant()
+                startTime,
+                endTime
         );
     }
 
@@ -68,9 +96,5 @@ public class Generator {
             events.add(createEvent(eventOwner, daysOffsets.get(i), eventDurationMinutes.get(i)));
         }
         return events;
-    }
-
-    public String createStringAttribute(String attributeName) {
-        return attributeName + " " + RANDOM.nextDouble(0, 10);
     }
 }

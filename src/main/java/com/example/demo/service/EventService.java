@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -18,10 +19,9 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
-    public ResponseEntity<List<EventDTO>> getAllEventsInRange(Instant startInstant, Instant endInstant, EventOwner eventOwner) {
-        List<EventDTO> eventDTOList = eventRepository.findByEventOwnerAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(eventOwner, endInstant, startInstant).stream()
+    public List<EventDTO> getAllEventsInRange(EventOwner eventOwner, Instant startInstant, Instant endInstant) {
+        return eventRepository.findByEventOwnerAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(eventOwner, startInstant, endInstant).stream()
                 .map(eventMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(eventDTOList);
     }
 }

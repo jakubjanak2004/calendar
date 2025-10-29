@@ -8,6 +8,6 @@ import java.time.Instant;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
-    List<Event> findByEventOwnerAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-            EventOwner eventOwner, Instant rangeEndInclusive, Instant rangeStartInclusive);
+    List<Event> findByEventOwnerAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(
+            EventOwner eventOwner, Instant rangeStartInclusive, Instant rangeEndInclusive);
 }
