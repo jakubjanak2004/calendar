@@ -5,7 +5,7 @@ import com.example.demo.model.CalendarUser;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CalendarUserSignupMapper implements Mapper<CalendarUser, SignUpDTO>{
+public class SignUpMapper implements Mapper<CalendarUser, SignUpDTO>{
     @Override
     public CalendarUser toEntity(SignUpDTO signupDTO) {
         return new CalendarUser(signupDTO.getFirstName(), signupDTO.getLastName(), signupDTO.getUsername(), signupDTO.getPassword());
@@ -13,6 +13,11 @@ public class CalendarUserSignupMapper implements Mapper<CalendarUser, SignUpDTO>
 
     @Override
     public SignUpDTO toDTO(CalendarUser calendarUser) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public CalendarUser updateEntity(CalendarUser calendarUser, SignUpDTO signUpDTO) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import {setAuthTokenProvider} from "../../requests/http.jsx";
+import {http} from "../../requests/http.jsx";
 
 const AuthCtx = createContext(null);
 
@@ -10,7 +10,7 @@ export function AuthProvider({children}) {
     const [lastName, setLastName] = useState("")
 
     useEffect(() => {
-        setAuthTokenProvider(() => token);
+        http.setToken(token)
     }, [token])
 
     const value = useMemo(() => ({

@@ -59,28 +59,16 @@ public class Generator {
         ZonedDateTime endDateTime = startDateTime.plusMinutes(eventDurationMinutes);
         return createEvent(
                 eventOwner,
-                zone,
                 startDateTime.toInstant(),
                 endDateTime.toInstant()
         );
     }
 
     public Event createEvent(EventOwner eventOwner, Instant startTime, Instant endTime) {
-        ZoneId zone = ZoneId.of("Europe/Prague");
-        return createEvent(
-                eventOwner,
-                zone,
-                startTime,
-                endTime
-        );
-    }
-
-    public Event createEvent(EventOwner eventOwner, ZoneId zone, Instant startTime, Instant endTime) {
         return new Event(
                 eventOwner,
                 createStringAttribute("title"),
                 createStringAttribute("description"),
-                zone,
                 startTime,
                 endTime
         );

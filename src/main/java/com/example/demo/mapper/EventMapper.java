@@ -14,11 +14,16 @@ public class EventMapper implements Mapper<Event, EventDTO>{
     @Override
     public EventDTO toDTO(Event event) {
         return new EventDTO(
+                event.getUuid(),
                 event.getTitle(),
                 event.getDescription(),
-                event.getTimeZone(),
                 event.getStartTime(),
                 event.getEndTime()
         );
+    }
+
+    @Override
+    public Event updateEntity(Event event, EventDTO eventDTO) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
