@@ -30,7 +30,8 @@ FR5 — Group Events (permissions)
 2. System should be containerized for easy deployment.
 
 ## List of Users
-
+![Users Diagram](docs/users-Users.drawio.png)
 ## Use-Case Diagrams
-
+![Use Case Diagram](docs/users-Use-case.drawio.png)
 ## Class Diagram
+![Class Diagram](docs/users-Class-diagram.drawio.png)

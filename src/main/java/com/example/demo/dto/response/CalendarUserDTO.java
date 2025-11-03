@@ -5,8 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AuthResponseDTO {
-    private String token;
+public class CalendarUserDTO {
     private String username;
     private String firstName;
     private String lastName;

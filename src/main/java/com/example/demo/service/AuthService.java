@@ -4,10 +4,10 @@ import com.example.demo.config.JwtProps;
 import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
+import com.example.demo.exception.UsernameExistsException;
 import com.example.demo.mapper.CalendarUserMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.exception.UsernameExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,13 +33,11 @@ public class AuthService {
     private final JwtProps jwtProps;
 
     public AuthResponseDTO login(LoginDTO loginDTO) {
-        Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
-        );
+        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
 
         CalendarUser user = (CalendarUser) auth.getPrincipal();
         String token = generateToken(user);
-        return new AuthResponseDTO(token);
+        return new AuthResponseDTO(token, user.getUsername(), user.getFirstName(), user.getLastName());
     }
 
     public AuthResponseDTO signup(SignUpDTO signupDTO) {
@@ -50,17 +48,13 @@ public class AuthService {
         CalendarUser calendarUser = CalendarUserMapper.toEntity(signupDTO);
         userRepository.save(calendarUser);
         String token = generateToken(calendarUser);
-        return new AuthResponseDTO(token);
+        return new AuthResponseDTO(token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
     }
 
     private String generateToken(UserDetails userDetails) {
         Instant now = Instant.now();
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(jwtProps.issuer())
-                .issuedAt(now)
-                .expiresAt(now.plus(jwtProps.accessTtl()))
-                .subject(userDetails.getUsername()).build();
+        JwtClaimsSet claims = JwtClaimsSet.builder().issuer(jwtProps.issuer()).issuedAt(now).expiresAt(now.plus(jwtProps.accessTtl())).subject(userDetails.getUsername()).build();
 
         JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
 

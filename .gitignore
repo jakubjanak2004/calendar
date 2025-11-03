@@ -32,7 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /data/
-# Vite cache
-.vite/
-**/.vite/
-src/main/webapp/.vite/
+/src/main/node_modules/*
