@@ -1,23 +1,35 @@
 import axios from "axios";
-import {CONFIG} from "../constants.js";
-import {useAuth} from "../pages/auth/AuthContext.jsx";
+import { CONFIG } from "../constants.js";
 
-export const http = axios.create({
-    baseURL: CONFIG.API_URL,
-    timeout: CONFIG.TIMEOUT_MS,
-    // If your Spring Boot uses cookie-based auth/CSRF, enable this:
-    // withCredentials: true,
-    headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+export const http = {
+    _token: undefined,
+
+    setToken(t) {
+        this._token = t ?? undefined;
     },
-});
+    clearToken() {
+        this._token = undefined;
+    },
 
-// Optional: normalize errors
-http.interceptors.response.use(
+    client: axios.create({
+        baseURL: CONFIG.API_URL,
+        timeout: CONFIG.TIMEOUT_MS,
+        // withCredentials: true, // if you switch to cookie auth
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+    }),
+};
+
+// attach interceptors
+http.client.interceptors.request.use(async (cfg) => {
+    const token = http._token;
+    if (token) cfg.headers.Authorization = `Bearer ${token}`;
+    return cfg;
+})
+
+http.client.interceptors.response.use(
     (r) => r,
-    (err) => {
-        // You can centralize refresh-token logic here if needed
-        return Promise.reject(err);
-    }
-);
+    (err) => Promise.reject(err)
+)

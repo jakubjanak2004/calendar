@@ -1,9 +1,10 @@
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../auth/AuthContext.jsx";
+import Calendar from "./calendar/Calendar.jsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
-    const {logout, username, firstName, lastName} = useAuth()
+    const {logout} = useAuth()
 
     function handleSignOut(e) {
         e.preventDefault();
@@ -12,9 +13,9 @@ export function Dashboard() {
     }
 
     return <>
-        <button onClick={handleSignOut}>Sign Out</button>
-        <h1>Dashboard</h1>
-        <h2>username: {username}</h2>
-        <h2>name: {firstName} {lastName}</h2>
+        <header>
+            <button onClick={handleSignOut}>Sign Out</button>
+        </header>
+        <Calendar/>
     </>
 }

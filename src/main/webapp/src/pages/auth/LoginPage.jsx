@@ -4,37 +4,57 @@ import {useState} from "react";
 import {useAuth} from "./AuthContext.jsx";
 
 export function LoginPage() {
+    const {login} = useAuth()
     let [username, setUsername] = useState("")
+    let [error, setError] = useState("")
     const [password, setPassword] = useState("")
     const navigate = useNavigate()
-    const {login} = useAuth()
+
+    function handleUnauthorized() {
+        setError("Username or password is wrong")
+    }
 
     async function handleLogin(e) {
         e.preventDefault()
-        const res = await http.post("auth/login", {username, password})
-        const token = res.data.token
-        const firstName = res.data.firstName
-        const lastName = res.data.lastName
-        login(token, username, firstName, lastName)
-        navigate("/", {replace: true})
+        try {
+            const res = await http.client.post("auth/login", {username, password})
+            const token = res.data.token
+            const firstName = res.data.firstName
+            const lastName = res.data.lastName
+            login(token, username, firstName, lastName)
+            navigate("/", {replace: true})
+        } catch (error) {
+            if (error.response.status === 401) {
+                handleUnauthorized()
+            }
+        }
     }
 
     return <>
-        <Link to={"/signup"}>Sign Up</Link>
-        <h1>Login Page</h1>
-        <form onSubmit={e => handleLogin(e)}>
+        <header>
+            <Link to={"/signup"}>Sign Up</Link>
+        </header>
+        <h1 className={"main-header"}>Login Page</h1>
+        <form onSubmit={e => handleLogin(e)} className={"auth-form"}>
             <input
                 type="text"
                 placeholder={"username"}
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
+                autoComplete="username"
+                required
             />
             <input
                 type="password"
                 placeholder={"password"}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
+                autoComplete="password"
+                required
             />
             <input type="submit" value={"LogIn"}/>
         </form>
+        <p role="alert">
+            {error}
+        </p>
     </>
 }

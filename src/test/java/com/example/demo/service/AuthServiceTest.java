@@ -4,7 +4,7 @@ import com.example.demo.config.JwtProps;
 import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
-import com.example.demo.exception.UsernameExistsException;
+import com.example.demo.exception.UsernameAlreadyExistsException;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.utils.Generator;
@@ -67,7 +67,7 @@ public class AuthServiceTest {
 
     @Test
     public void signupThrowsUsernameExistsExceptionIfNewUsernameIsUsed() {
-        assertThrows(UsernameExistsException.class,
+        assertThrows(UsernameAlreadyExistsException.class,
                 () -> authService.signup(new SignUpDTO(
                         "firstName",
                         "secondName",

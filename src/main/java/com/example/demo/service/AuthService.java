@@ -4,8 +4,8 @@ import com.example.demo.config.JwtProps;
 import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
-import com.example.demo.exception.UsernameExistsException;
-import com.example.demo.mapper.CalendarUserMapper;
+import com.example.demo.exception.UsernameAlreadyExistsException;
+import com.example.demo.mapper.SignUpMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
     private final JwtProps jwtProps;
+    private final SignUpMapper signUpMapper;
 
     public AuthResponseDTO login(LoginDTO loginDTO) {
         Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
@@ -42,10 +43,10 @@ public class AuthService {
 
     public AuthResponseDTO signup(SignUpDTO signupDTO) {
         if (userRepository.existsByUsername(signupDTO.getUsername())) {
-            throw new UsernameExistsException("Username already taken");
+            throw new UsernameAlreadyExistsException("Username already taken");
         }
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
-        CalendarUser calendarUser = CalendarUserMapper.toEntity(signupDTO);
+        CalendarUser calendarUser = signUpMapper.toEntity(signupDTO);
         userRepository.save(calendarUser);
         String token = generateToken(calendarUser);
         return new AuthResponseDTO(token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
@@ -59,5 +60,9 @@ public class AuthService {
         JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
+    }
+
+    public boolean usernameTaken(String username) {
+        return userRepository.existsByUsername(username);
     }
 }

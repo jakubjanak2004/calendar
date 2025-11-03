@@ -10,13 +10,7 @@ export function AuthProvider({children}) {
     const [lastName, setLastName] = useState("")
 
     useEffect(() => {
-        if (token) {
-            http.interceptors.request.use((config) => {
-                const {token} = useAuth()
-                if (token) config.headers.Authorization = `Bearer ${token}`;
-                return config;
-            })
-        }
+        http.setToken(token)
     }, [token])
 
     const value = useMemo(() => ({

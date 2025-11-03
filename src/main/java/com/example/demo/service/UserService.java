@@ -12,8 +12,9 @@ import com.example.demo.dto.response.CalendarUserDTO;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final CalendarUserMapper calendarUserMapper;
 
     public Page<CalendarUserDTO> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(CalendarUserMapper::toDTO);
+        return userRepository.findAll(pageable).map(calendarUserMapper::toDTO);
     }
 }
