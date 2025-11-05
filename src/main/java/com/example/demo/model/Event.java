@@ -22,7 +22,7 @@ import java.util.UUID;
 public class Event {
     @Id
     @GeneratedValue
-    private UUID uuid;
+    private UUID id;
 
     public Event(EventOwner eventOwner, String title, String description, Instant startTime, Instant endTime) {
         this.eventOwner = eventOwner;

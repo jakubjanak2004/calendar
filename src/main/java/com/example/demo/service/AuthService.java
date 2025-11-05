@@ -7,7 +7,7 @@ import com.example.demo.dto.response.AuthResponseDTO;
 import com.example.demo.exception.UsernameAlreadyExistsException;
 import com.example.demo.mapper.SignUpMapper;
 import com.example.demo.model.CalendarUser;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.CalendarUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +27,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManager authManager;
-    private final UserRepository userRepository;
+    private final CalendarUserRepository calendarUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
     private final JwtProps jwtProps;
@@ -38,18 +38,18 @@ public class AuthService {
 
         CalendarUser user = (CalendarUser) auth.getPrincipal();
         String token = generateToken(user);
-        return new AuthResponseDTO(token, user.getUsername(), user.getFirstName(), user.getLastName());
+        return new AuthResponseDTO(user.getId(), token, user.getUsername(), user.getFirstName(), user.getLastName());
     }
 
     public AuthResponseDTO signup(SignUpDTO signupDTO) {
-        if (userRepository.existsByUsername(signupDTO.getUsername())) {
+        if (calendarUserRepository.existsByUsername(signupDTO.getUsername())) {
             throw new UsernameAlreadyExistsException("Username already taken");
         }
         signupDTO.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
         CalendarUser calendarUser = signUpMapper.toEntity(signupDTO);
-        userRepository.save(calendarUser);
+        calendarUserRepository.save(calendarUser);
         String token = generateToken(calendarUser);
-        return new AuthResponseDTO(token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
+        return new AuthResponseDTO(calendarUser.getId(), token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
     }
 
     private String generateToken(UserDetails userDetails) {
@@ -63,6 +63,6 @@ public class AuthService {
     }
 
     public boolean usernameTaken(String username) {
-        return userRepository.existsByUsername(username);
+        return calendarUserRepository.existsByUsername(username);
     }
 }

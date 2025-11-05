@@ -1,8 +1,8 @@
 import {useEffect, useMemo, useState} from "react";
-import {http} from "../../../requests/http.jsx";
+import {http} from "../../requests/http.jsx";
 import CalendarEvent from "./CalendarEvent.jsx";
 
-export default function CalendarDay({date}) {
+export default function CalendarDay({date, eventOwnerId}) {
     const [events, setEvents] = useState([]);
     const [selected, setSelected] = useState(false);
     const now = new Date();
@@ -20,7 +20,7 @@ export default function CalendarDay({date}) {
 
     async function getEventsForDay() {
         try {
-            const res = await http.client.get(`/events/${start}/${end}`)
+            const res = await http.client.get(`eventOwners/${eventOwnerId}/events/${start}/${end}`)
             setEvents(res.data)
         } catch (err) {
             console.error(err)

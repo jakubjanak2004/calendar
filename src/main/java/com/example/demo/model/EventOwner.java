@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -19,7 +20,7 @@ import java.util.List;
 public class EventOwner {
     @Id
     @GeneratedValue
-    private Long id;
+    private UUID id;
 
     @OneToMany(mappedBy = "eventOwner", cascade = CascadeType.PERSIST)
     private List<Event> events;
