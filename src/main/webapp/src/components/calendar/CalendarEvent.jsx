@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {http} from "../../../requests/http.jsx";
+import {http} from "../../requests/http.jsx";
 
 const timeFmt = new Intl.DateTimeFormat(undefined, {
     hour: "2-digit", minute: "2-digit", hour12: false,

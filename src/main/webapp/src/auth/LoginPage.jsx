@@ -1,5 +1,5 @@
 import {Link, useNavigate} from "react-router-dom";
-import {http} from "../../requests/http.jsx";
+import {http} from "../requests/http.jsx";
 import {useState} from "react";
 import {useAuth} from "./AuthContext.jsx";
 
@@ -19,9 +19,10 @@ export function LoginPage() {
         try {
             const res = await http.client.post("auth/login", {username, password})
             const token = res.data.token
+            const userId = res.data.userId
             const firstName = res.data.firstName
             const lastName = res.data.lastName
-            login(token, username, firstName, lastName)
+            login(token, userId, username, firstName, lastName)
             navigate("/", {replace: true})
         } catch (error) {
             if (error.response.status === 401) {

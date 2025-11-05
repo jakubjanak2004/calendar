@@ -14,7 +14,7 @@ public class EventMapper implements Mapper<Event, EventDTO>{
     @Override
     public EventDTO toDTO(Event event) {
         return new EventDTO(
-                event.getUuid(),
+                event.getId(),
                 event.getTitle(),
                 event.getDescription(),
                 event.getStartTime(),

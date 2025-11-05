@@ -2,12 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.dto.request.EventRequestDTO;
 import com.example.demo.dto.response.EventDTO;
-import com.example.demo.mapper.CalendarUserMapper;
 import com.example.demo.mapper.EventMapper;
 import com.example.demo.mapper.EventRequestMapper;
-import com.example.demo.model.CalendarUser;
 import com.example.demo.model.Event;
-import com.example.demo.model.EventOwner;
+import com.example.demo.repository.EventOwnerRepository;
 import com.example.demo.repository.EventRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +23,12 @@ import java.util.UUID;
 public class EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
-    private final CalendarUserMapper calendarUserMapper;
     private final EventRequestMapper eventRequestMapper;
+    private final EventOwnerRepository eventOwnerRepository;
 
-    public List<EventDTO> getAllEventsInRangeForEventOwner(EventOwner eventOwner, Instant startInstant, Instant endInstant) {
-        return eventRepository.findByEventOwnerAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(eventOwner, startInstant, endInstant).stream()
+    @PreAuthorize("@eventSecurity.canEditEventOwner(#eventOwnerId, authentication)")
+    public List<EventDTO> getAllEventsInRangeForEventOwner(UUID eventOwnerId, Instant startInstant, Instant endInstant) {
+        return eventRepository.findByEventOwnerIdAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(eventOwnerId, startInstant, endInstant).stream()
                 .map(eventMapper::toDTO)
                 .toList();
     }
@@ -41,9 +40,10 @@ public class EventService {
         eventRepository.save(event);
     }
 
-    public EventDTO createEvent(EventOwner eventOwner, @Valid EventRequestDTO eventRequestDTO) {
+    @PreAuthorize("@eventSecurity.canEditEventOwner(#eventOwnerId, authentication)")
+    public EventDTO createEvent(UUID eventOwnerId, @Valid EventRequestDTO eventRequestDTO) {
         Event event = eventRequestMapper.toEntity(eventRequestDTO);
-        event.setEventOwner(eventOwner);
+        event.setEventOwner(eventOwnerRepository.findById(eventOwnerId).orElseThrow());
         return eventMapper.toDTO(eventRepository.save(event));
     }
 

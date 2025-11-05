@@ -1,6 +1,6 @@
 package com.example.demo.config;
 
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.CalendarUserRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -87,8 +87,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return username -> userRepository.findByUsername(username)
+    public UserDetailsService userDetailsService(CalendarUserRepository calendarUserRepository) {
+        return username -> calendarUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

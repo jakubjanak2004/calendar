@@ -1,10 +1,10 @@
-import {useNavigate} from "react-router-dom";
-import {useAuth} from "../auth/AuthContext.jsx";
-import Calendar from "./calendar/Calendar.jsx";
+import {Link, useNavigate} from "react-router-dom";
+import {useAuth} from "../../auth/AuthContext.jsx";
+import Calendar from "../../components/calendar/Calendar.jsx";
 
 export function Dashboard() {
     const navigate = useNavigate();
-    const {logout} = useAuth()
+    const {logout, userId} = useAuth()
 
     function handleSignOut(e) {
         e.preventDefault();
@@ -16,6 +16,7 @@ export function Dashboard() {
         <header>
             <button onClick={handleSignOut}>Sign Out</button>
         </header>
-        <Calendar/>
+        <Link to={"/groups"}>Groups</Link>
+        <Calendar eventOwnerId={userId}/>
     </>
 }

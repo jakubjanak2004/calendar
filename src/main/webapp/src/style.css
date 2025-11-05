@@ -192,6 +192,16 @@ p[role="alert"] {
 }
 
 /* addEvent */
-#add-event {
+/* todo */
 
+/* Group */
+.group-li {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+
+    P {
+        /*text-align: center*/
+        font-size: 18px;
+    }
 }

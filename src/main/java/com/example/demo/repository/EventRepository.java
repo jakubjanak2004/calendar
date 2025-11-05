@@ -12,9 +12,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EventRepository extends JpaRepository<Event, UUID> {
-    List<Event> findByEventOwnerAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(
-            EventOwner eventOwner, Instant rangeStartInclusive, Instant rangeEndInclusive);
+    List<Event> findByEventOwnerIdAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(
+            UUID eventOwnerId, Instant rangeStartInclusive, Instant rangeEndInclusive);
 
-    @Query("select e.eventOwner.id from Event e where e.uuid = :id")
-    Optional<Long> findOwnerIdById(@Param("id") UUID id);
+    @Query("select e.eventOwner.id from Event e where e.id = :id")
+    Optional<UUID> findOwnerIdById(@Param("id") UUID id);
+
+    @Query("select e.eventOwner from Event e where e.id = :id")
+    Optional<EventOwner> findOwnerById(@Param("id") UUID id);
 }

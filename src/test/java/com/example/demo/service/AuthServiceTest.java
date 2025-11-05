@@ -6,7 +6,7 @@ import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
 import com.example.demo.exception.UsernameAlreadyExistsException;
 import com.example.demo.model.CalendarUser;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.service.utils.Generator;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,13 +27,13 @@ public class AuthServiceTest {
     private final JwtDecoder jwtDecoder;
     private final Generator generator;
     private final AuthService authService;
-    private final UserRepository userRepository;
+    private final CalendarUserRepository calendarUserRepository;
     private final JwtProps jwtProps;
     private CalendarUser calendarUser;
 
     @BeforeEach
     void setUp() {
-        calendarUser = userRepository.save(generator.createUser(password));
+        calendarUser = calendarUserRepository.save(generator.createUser(password));
     }
 
     @Test

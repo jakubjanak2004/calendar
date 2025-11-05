@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
-import { http } from "../../requests/http.jsx";
+import { http } from "../requests/http.jsx";
 import { useAuth } from "./AuthContext.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 async function isUsernameAvailable(username) {
-    const res = await http.client.get("auth/usernameTaken", { params: {username} });
+    const res = await http.client.get("/auth/usernameTaken", { params: {username} });
     return Boolean(!res.data);
 }
 

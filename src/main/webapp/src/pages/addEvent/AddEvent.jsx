@@ -1,6 +1,6 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useState} from "react";
-import {http} from "../../../requests/http.jsx";
+import {http} from "../../requests/http.jsx";
 
 function toLocalInputValue(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -20,10 +20,12 @@ export function AddEvent() {
     const [description, setDescription] = useState("")
     const [startTime, setStartTime] = useState(toLocalInputValue(new Date()));
     const [endTime, setEndTime] = useState(toLocalInputValue(new Date()));
+    const { eventOwnerId } = useParams();
 
     async function createNewEvent(e) {
         e.preventDefault()
-        const res = await http.client.post("/events",
+        console.log(eventOwnerId)
+        const res = await http.client.post(`/eventOwners/${eventOwnerId}/events`,
             {
                 title,
                 description,
@@ -45,6 +47,7 @@ export function AddEvent() {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder={"Title"}
+                required
             />
             <input
                 type="text"
@@ -56,11 +59,13 @@ export function AddEvent() {
                 type="datetime-local"
                 value={startTime}
                 onChange={e => setStartTime(e.target.value)}
+                required
             />
             <input
                 type="datetime-local"
                 value={endTime}
                 onChange={e => setEndTime(e.target.value)}
+                required
             />
             <input type="submit" value={"Create"}/>
         </form>
