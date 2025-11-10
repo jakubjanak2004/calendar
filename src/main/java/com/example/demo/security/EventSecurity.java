@@ -2,13 +2,12 @@ package com.example.demo.security;
 
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.EventOwner;
-import com.example.demo.model.MembershipType;
+import com.example.demo.model.MembershipRole;
 import com.example.demo.model.UserGroup;
 import com.example.demo.repository.EventOwnerRepository;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
-import com.example.demo.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -40,8 +39,8 @@ public class EventSecurity {
             return calendarUser.getId().equals(eventOwner.getId());
         }
         if (eventOwner instanceof UserGroup) {
-            return groupMembershipRepository.existsByGroupIdAndUserIdAndMembershipTypeIn(
-                    eventOwner.getId(), calendarUser.getId(), List.of(MembershipType.ADMIN, MembershipType.EDITOR)
+            return groupMembershipRepository.existsByGroupIdAndUserIdAndMembershipRoleIn(
+                    eventOwner.getId(), calendarUser.getId(), List.of(MembershipRole.ADMIN, MembershipRole.EDITOR)
             );
         }
         return false;

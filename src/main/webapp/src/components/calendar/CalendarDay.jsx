@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {http} from "../../requests/http.jsx";
+import {http} from "../../lib/http.jsx";
 import CalendarEvent from "./CalendarEvent.jsx";
 
 export default function CalendarDay({date, eventOwnerId}) {

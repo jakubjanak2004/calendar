@@ -25,7 +25,9 @@ public class DatabaseInitializer implements CommandLineRunner {
     public void run(String... args) {
         // create admin user
         CalendarUser calendarUser = generator.createUser("admin", "admin");
+        List<CalendarUser> calendarUsers = generator.createUsers("user", "admin", 5);
         calendarUserRepository.save(calendarUser);
+        calendarUserRepository.saveAll(calendarUsers);
         // create events for admin user
         List<Event> events = generator.createEvents(
                 calendarUser,

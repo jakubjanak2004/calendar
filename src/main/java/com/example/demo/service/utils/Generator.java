@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -84,5 +85,11 @@ public class Generator {
             events.add(createEvent(eventOwner, daysOffsets.get(i), eventDurationMinutes.get(i)));
         }
         return events;
+    }
+
+    public List<CalendarUser> createUsers(String usernameStart, String password, int n) {
+        return IntStream.rangeClosed(1, n)
+                .mapToObj(i -> createUser(createStringAttribute(usernameStart), password))
+                .toList();
     }
 }

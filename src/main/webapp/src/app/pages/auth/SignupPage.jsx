@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { http } from "../requests/http.jsx";
-import { useAuth } from "./AuthContext.jsx";
+import { http } from "../../../lib/http.jsx";
+import { useAuth } from "../../../features/AuthContext.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
