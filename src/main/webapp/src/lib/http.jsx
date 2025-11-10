@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CONFIG } from "../constants.js";
+import { CONFIG } from "../config/constants.js";
 
 export const http = {
     _token: undefined,

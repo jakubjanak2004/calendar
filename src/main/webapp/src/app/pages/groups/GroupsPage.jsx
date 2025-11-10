@@ -1,19 +1,17 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { http } from "../../requests/http.jsx";
-import UserGroup from "./UserGroup.jsx";
+import { http } from "../../../lib/http.jsx";
+import UserGroup from "../../../components/groups/UserGroup.jsx";
 
 export default function GroupsPage() {
     const [content, setContent] = useState([]);
-    const [page, setPage] = useState(0);      // 0-based
+    const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState(false);
-    // const [error, setError] = useState("");
 
     async function getUserGroups(p = page, s = size) {
         setLoading(true);
-        // setError("");
         try {
             const res = await http.client.get("/groups", {
                 params: { page: p, size: s, sort: "name,asc" }, // adjust sort as you like
@@ -59,7 +57,6 @@ export default function GroupsPage() {
             </div>
 
             {loading && <p>Loading…</p>}
-            {/*{error && <p style={{ color: "crimson" }}>{error}</p>}*/}
 
             <h2>Your groups:</h2>
             <ul>

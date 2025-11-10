@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import {http} from "../requests/http.jsx";
+import {http} from "../lib/http.jsx";
 
 const AuthCtx = createContext(null);
 

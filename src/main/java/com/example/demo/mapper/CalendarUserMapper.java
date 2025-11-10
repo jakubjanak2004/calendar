@@ -13,7 +13,7 @@ public class CalendarUserMapper implements Mapper<CalendarUser, CalendarUserDTO>
 
     @Override
     public CalendarUserDTO toDTO(CalendarUser calendarUser) {
-        return new CalendarUserDTO(calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
+        return new CalendarUserDTO(calendarUser.getId(), calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
     }
 
     @Override

@@ -20,19 +20,22 @@ public class GroupMembership {
     @Id
     @GeneratedValue
     private Long id;
+
     @ManyToOne(optional = false)
     @JoinColumn
     private CalendarUser user;
+
     @ManyToOne(optional = false)
     @JoinColumn
     private UserGroup group;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MembershipType membershipType = MembershipType.MEMBER;
+    private MembershipRole membershipRole = MembershipRole.MEMBER;
 
-    public GroupMembership(CalendarUser user, UserGroup group, MembershipType membershipType) {
+    public GroupMembership(CalendarUser user, UserGroup group, MembershipRole membershipRole) {
         this.user = user;
         this.group = group;
-        this.membershipType = membershipType;
+        this.membershipRole = membershipRole;
     }
 }

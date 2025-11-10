@@ -1,10 +1,15 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.request.EventRequestDTO;
+import com.example.demo.dto.response.EventDTO;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.Event;
+import com.example.demo.model.EventOwner;
+import com.example.demo.model.MembershipRole;
+import com.example.demo.model.UserGroup;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.CalendarUserRepository;
+import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.security.EventSecurity;
 import com.example.demo.service.utils.Generator;
 import jakarta.validation.ConstraintViolationException;
@@ -22,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -37,6 +43,8 @@ public class EventServiceTest {
     private CalendarUser calendarUser;
     @Autowired
     private CalendarUserRepository calendarUserRepository;
+    @Autowired
+    private UserGroupRepository userGroupRepository;
 
     @Autowired
     public EventServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
@@ -56,7 +64,7 @@ public class EventServiceTest {
 
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
-    public void updateEventThrowsAuthorizationDeniedExceptionWhenTheEventWithEventIdDoesNotExist() {
+    public void updateEventThrowsNoSuchElementExceptionWhenTheEventWithEventIdDoesNotExist() {
         EventRequestDTO eventRequestDTO = new EventRequestDTO(
                 "title",
                 "description",
@@ -68,7 +76,7 @@ public class EventServiceTest {
 
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
-    public void updateEventThrowsExceptionWhenUserIsNotOwnerOfThatEvent() {
+    public void updateEventThrowsAuthorizationDeniedExceptionWhenUserIsNotOwnerOfThatEvent() {
         CalendarUser calendarUser = calendarUserRepository.save(generator.createUser());
         Event event = eventRepository.save(
                 generator.createEvent(
@@ -104,6 +112,50 @@ public class EventServiceTest {
                 Instant.now().minus(1, ChronoUnit.MINUTES)
         );
         Assertions.assertThrows(ConstraintViolationException.class, () -> eventService.updateEvent(event.getId(), eventRequestDTO));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void createEventThrowsAuthorizationDeniedExceptionWhenUserIsNotAuthorizedToEditEventOwner() {
+        EventOwner eventOwner =  userGroupRepository.save(new UserGroup("Group"));
+        EventRequestDTO eventRequestDTO = new EventRequestDTO(
+                "title",
+                "description",
+                Instant.now(),
+                Instant.now().plus(30, ChronoUnit.MINUTES)
+        );
+        Assertions.assertThrows(AuthorizationDeniedException.class, () -> eventService.createEvent(eventOwner.getId(), eventRequestDTO));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void createEventThrowsConstraintViolationExceptionWhenEndTimeIsBeforeStartTime() {
+        UserGroup userGroup = userGroupRepository.save(new UserGroup("Group"));
+        userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.EDITOR);
+        UUID groupId = userGroupRepository.save(userGroup).getId();
+        EventRequestDTO eventRequestDTO = new EventRequestDTO(
+                "title",
+                "description",
+                Instant.now(),
+                Instant.now().minus(30, ChronoUnit.MINUTES)
+        );
+        Assertions.assertThrows(ConstraintViolationException.class, () -> eventService.createEvent(groupId, eventRequestDTO));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void createEventCreatesNewEventForEventOwner() {
+        UserGroup userGroup = userGroupRepository.save(new UserGroup("group"));
+        userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.EDITOR);
+        userGroupRepository.save(userGroup);
+        EventRequestDTO eventRequestDTO = new EventRequestDTO(
+                "title",
+                "description",
+                Instant.now(),
+                Instant.now().plus(30, ChronoUnit.MINUTES)
+        );
+        EventDTO eventDTO = eventService.createEvent(userGroup.getId(), eventRequestDTO);
+        Assertions.assertTrue(eventRepository.existsById(eventDTO.getId()));
     }
 
     @Test

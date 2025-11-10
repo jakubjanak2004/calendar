@@ -16,20 +16,28 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserGroup extends EventOwner {
-    @OneToMany(mappedBy = "group", orphanRemoval = true, cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "group", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<GroupMembership> groupMembershipList = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
 
-    public UserGroup(List<CalendarUser> calendarUsers, String name) {
+    public UserGroup(String name) {
         this.name = name;
-        addCalendarUsersToGroup(calendarUsers, MembershipType.EDITOR);
     }
 
-    public void addCalendarUsersToGroup(List<CalendarUser> calendarUsers, MembershipType membershipType) {
+    public UserGroup(List<CalendarUser> calendarUsers, String name) {
+        this.name = name;
+        addCalendarUsersToGroup(calendarUsers, MembershipRole.ADMIN);
+    }
+
+    public void addCalendarUsersToGroup(List<CalendarUser> calendarUsers, MembershipRole membershipRole) {
         for (CalendarUser calendarUser : calendarUsers) {
-            groupMembershipList.add(new GroupMembership(calendarUser, this, membershipType));
+            groupMembershipList.add(new GroupMembership(calendarUser, this, membershipRole));
         }
+    }
+
+    public void inviteUser(CalendarUser calendarUser) {
+        groupMembershipList.add(new GroupMembership(calendarUser, this, MembershipRole.INVITED));
     }
 }

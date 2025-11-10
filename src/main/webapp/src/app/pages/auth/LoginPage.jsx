@@ -1,7 +1,7 @@
 import {Link, useNavigate} from "react-router-dom";
-import {http} from "../requests/http.jsx";
+import {http} from "../../../lib/http.jsx";
 import {useState} from "react";
-import {useAuth} from "./AuthContext.jsx";
+import {useAuth} from "../../../features/AuthContext.jsx";
 
 export function LoginPage() {
     const {login} = useAuth()

@@ -1,6 +1,6 @@
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useState} from "react";
-import {http} from "../../requests/http.jsx";
+import {http} from "../../lib/http.jsx";
 
 function toLocalInputValue(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -15,12 +15,13 @@ function toLocalInputValue(date) {
 
 const toIso = (local) => new Date(local).toISOString();
 
-export function AddEvent() {
+export function AddEventPage() {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [startTime, setStartTime] = useState(toLocalInputValue(new Date()));
     const [endTime, setEndTime] = useState(toLocalInputValue(new Date()));
     const { eventOwnerId } = useParams();
+    const navigate = useNavigate()
 
     async function createNewEvent(e) {
         e.preventDefault()
@@ -33,13 +34,16 @@ export function AddEvent() {
                 endTime: toIso(endTime)
             }
         )
-        console.log(res)
         // todo later add the event into the global event handling
-        // todo navigate back to calendar
+        navigateBack()
+    }
+
+    function navigateBack() {
+        navigate(-1)
     }
 
     return <>
-        <Link to={"/dashboard"}>Dashboard</Link>
+        <button onClick={navigateBack}>Back</button>
         <h1>Create New Event</h1>
         <form id={"add-event"} onSubmit={createNewEvent}>
             <input

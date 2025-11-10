@@ -1,5 +1,5 @@
 package com.example.demo.model;
 
-public enum MembershipType {
+public enum MembershipRole {
     MEMBER, EDITOR, ADMIN, INVITED
 }

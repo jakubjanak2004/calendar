@@ -1,12 +1,22 @@
 package com.example.demo.repository;
 
+import com.example.demo.model.CalendarUser;
 import com.example.demo.model.GroupMembership;
-import com.example.demo.model.MembershipType;
+import com.example.demo.model.MembershipRole;
+import com.example.demo.model.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface GroupMembershipRepository extends JpaRepository<GroupMembership, Long> {
-    boolean existsByGroupIdAndUserIdAndMembershipTypeIn(UUID groupId, UUID userId, List<MembershipType> types);
+    boolean existsByGroupIdAndUserIdAndMembershipRoleIn(UUID groupId, UUID userId, List<MembershipRole> types);
+    Optional<GroupMembership> findGroupMembershipByGroupAndUser(UserGroup group, CalendarUser user);
+
+    List<GroupMembership> findAllByGroupAndMembershipRoleNot(UserGroup group, MembershipRole role);
+    List<GroupMembership> findAllByGroupAndMembershipRole(UserGroup userGroup, MembershipRole membershipRole);
+
+    void deleteByGroupAndUser(UserGroup group, CalendarUser user);
 }

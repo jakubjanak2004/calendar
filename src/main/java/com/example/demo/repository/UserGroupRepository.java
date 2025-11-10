@@ -16,14 +16,14 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, UUID> {
             from UserGroup g
             join g.groupMembershipList gm
             where gm.user.id = :userId
-              and gm.membershipType <> MembershipType.INVITED
+              and gm.membershipRole <> MembershipRole.INVITED
         """,
             countQuery = """
             select count(distinct g)
             from UserGroup g
             join g.groupMembershipList gm
             where gm.user.id = :userId
-              and gm.membershipType <> MembershipType.INVITED
+              and gm.membershipRole <> MembershipRole.INVITED
         """
     )
     Page<UserGroup> findParticipatingGroupsExcludingInvitations(

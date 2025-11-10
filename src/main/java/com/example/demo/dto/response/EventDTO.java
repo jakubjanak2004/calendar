@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class EventDTO {
-    private UUID uuid;
+    private UUID id;
     private String title;
     private String description;
     private Instant startTime;
