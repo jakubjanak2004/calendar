@@ -10,9 +10,12 @@ import com.example.demo.service.utils.Generator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Profile("!test")
 @Configuration
 @RequiredArgsConstructor
 public class DatabaseInitializer implements CommandLineRunner {
@@ -22,6 +25,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     private final UserGroupRepository userGroupRepository;
 
     @Override
+    @Transactional
     public void run(String... args) {
         // create admin user
         CalendarUser calendarUser = generator.createUser("admin", "admin");
