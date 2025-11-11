@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.SystemTest;
 import com.example.demo.dto.request.EventRequestDTO;
 import com.example.demo.dto.response.EventDTO;
 import com.example.demo.model.CalendarUser;
@@ -17,13 +18,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -31,11 +30,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@SpringBootTest
 @WithMockUser
-@Import({EventServiceTest.MethodSec.class, EventSecurity.class})
-@Transactional
-public class EventServiceTest {
+@Import({EventSystemTest.MethodSec.class, EventSecurity.class})
+public class EventSystemTest extends SystemTest {
     private static final String EVENT_OWNER_USERNAME = "test";
     private final Generator generator;
     private final EventRepository eventRepository;
@@ -47,7 +44,7 @@ public class EventServiceTest {
     private UserGroupRepository userGroupRepository;
 
     @Autowired
-    public EventServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
+    public EventSystemTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
         this.generator = generator;
         this.calendarUserRepository = calendarUserRepository;
         this.eventRepository = eventRepository;
