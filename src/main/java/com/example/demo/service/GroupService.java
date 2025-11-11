@@ -32,13 +32,14 @@ public class GroupService {
     private final CalendarUserRepository calendarUserRepository;
     private final UserGroupRepository userGroupRepository;
 
-    @PreAuthorize("@userSecurity.isUser(#calendarUserId, authentication)")
-    public Page<UserGroupDTO> getAllGroupsForUserPageable(UUID calendarUserId, Pageable pageable) {
-        return groupRepository.findParticipatingGroupsExcludingInvitations(calendarUserId, pageable)
+    @PreAuthorize("@userSecurity.isUser(#username, authentication)")
+    public Page<UserGroupDTO> getAllGroupsForUserPageable(String username, Pageable pageable) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
+        return groupRepository.findParticipatingGroupsExcludingInvitations(calendarUser.getId(), pageable)
                 .map(userGroupMapper::toDTO);
     }
 
-    // todo add tests, add preauthorize
+    @PreAuthorize("@groupSecurity.belongsToGroup(#groupId, authentication)")
     public List<CalendarUserDTO> getAllUsersForGroupExcludingInvited(UUID groupId) {
         UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
         return groupMembershipRepository.findAllByGroupAndMembershipRoleNot(userGroup, MembershipRole.INVITED).stream()
@@ -47,7 +48,7 @@ public class GroupService {
                 .toList();
     }
 
-    // todo add test, add preauthorize
+    @PreAuthorize("@groupSecurity.belongsToGroup(#groupId, authentication)")
     public List<CalendarUserDTO> getAllInvitedUsersForGroup(UUID groupId) {
         UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
         return groupMembershipRepository.findAllByGroupAndMembershipRole(userGroup, MembershipRole.INVITED).stream()
@@ -56,22 +57,54 @@ public class GroupService {
                 .toList();
     }
 
-    // todo add tests, add preauthorize
-    public MembershipRole getMembershipRoleForUser(UUID groupId, CalendarUser userId) {
-        GroupMembership groupMembership = groupMembershipRepository.findGroupMembershipByGroupAndUser(groupRepository.findById(groupId).orElseThrow(), userId).orElseThrow();
+    @PreAuthorize("@groupSecurity.belongsToGroup(#groupId, authentication)")
+    public MembershipRole getMembershipRoleForUserAndGroup(String username, UUID groupId) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
+        GroupMembership groupMembership = groupMembershipRepository.findGroupMembershipByGroupAndUser(groupRepository.findById(groupId).orElseThrow(), calendarUser).orElseThrow();
         return groupMembership.getMembershipRole();
     }
 
-    // todo add tests, add pre authorize
-    public void deleteUserFromGroup(UUID groupId, UUID userId) {
-        groupMembershipRepository.deleteByGroupAndUser(groupRepository.findById(groupId).orElseThrow(), calendarUserRepository.findById(userId).orElseThrow());
+    @PreAuthorize("@groupSecurity.canManageGroupMembers(#groupId, authentication)")
+    public void deleteUserFromGroup(String username, UUID groupId) {
+        UserGroup userGroup = groupRepository.findById(groupId).orElseThrow();
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
+        deleteUserFromGroup(calendarUser, userGroup);
     }
 
-    // todo add tests, add pre authorize
-    public void inviteUserToGroup(UUID groupId, UUID userId) {
+    @PreAuthorize("@groupSecurity.canManageGroupMembers(#groupId, authentication)")
+    public void deleteUserFromGroup(UUID userId, UUID groupId) {
+        UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
+        CalendarUser calendarUser = calendarUserRepository.findById(userId).orElseThrow();
+        deleteUserFromGroup(calendarUser, userGroup);
+    }
+
+    private void deleteUserFromGroup(CalendarUser calendarUser, UserGroup userGroup) {
+        groupMembershipRepository.deleteByGroupAndUser(userGroup, calendarUser);
+    }
+
+    @PreAuthorize("@groupSecurity.canManageGroupMembers(#groupId, authentication)")
+    public void inviteUserToGroup(UUID userId, UUID groupId) {
         UserGroup userGroup = groupRepository.findById(groupId).orElseThrow();
         CalendarUser calendarUser = calendarUserRepository.findById(userId).orElseThrow();
         userGroup.inviteUser(calendarUser);
         userGroupRepository.save(userGroup);
+    }
+
+    @PreAuthorize("@userSecurity.isUser(#username, authentication)")
+    public List<UserGroupDTO> getGroupInvitationsForUser(String username) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
+        return groupMembershipRepository.findAllByUserAndMembershipRole(calendarUser, MembershipRole.INVITED).stream()
+                .map(GroupMembership::getGroup)
+                .map(userGroupMapper::toDTO)
+                .toList();
+    }
+
+    @PreAuthorize("@userSecurity.isUser(#username, authentication)")
+    public void acceptInvitationForUserAndGroup(String username, UUID groupId) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
+        UserGroup userGroup = groupRepository.findById(groupId).orElseThrow();
+        GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
+        groupMembership.setMembershipRole(MembershipRole.MEMBER);
+        groupMembershipRepository.save(groupMembership);
     }
 }

@@ -2,7 +2,7 @@ import {useMemo, useState} from "react";
 import CalendarDay from "./CalendarDay.jsx";
 import {Link} from "react-router-dom";
 
-export default function Calendar({eventOwnerId}) {
+export default function Calendar({eventOwnerId, canAddEvents}) {
     const [monthDateStart, setMonthDateStart] = useState(() => {
         const now = new Date();
         return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -26,7 +26,7 @@ export default function Calendar({eventOwnerId}) {
 
     return <div id={"dashboard"}>
         {/* Add event */}
-        <Link to={`/${eventOwnerId}/addEvent`}>Add Event</Link>
+        {canAddEvents && <Link to={`/${eventOwnerId}/addEvent`}>Add Event</Link>}
 
         {/* Change Month of the displayed calendar */}
         <div id={"month-info"}>

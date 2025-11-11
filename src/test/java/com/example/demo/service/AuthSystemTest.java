@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class AuthServiceTest {
+public class AuthSystemTest {
     private final String password = "password";
     private final JwtDecoder jwtDecoder;
     private final Generator generator;

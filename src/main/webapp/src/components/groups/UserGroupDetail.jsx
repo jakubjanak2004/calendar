@@ -13,8 +13,7 @@ export default function UserGroupDetail() {
     const groupName = location.state?.groupName;
     const navigate = useNavigate()
 
-
-    const canEdit = userRole === "EDITOR" || userRole === "ADMIN";
+    const canAddEvents = userRole === "EDITOR" || userRole === "ADMIN";
     const canManageMembership = userRole === "ADMIN";
 
     async function getGroupMembers() {
@@ -52,6 +51,6 @@ export default function UserGroupDetail() {
                 </li>
             ))}
         </ul>
-        <Calendar eventOwnerId={groupId}/>
+        <Calendar eventOwnerId={groupId} canAddEvents={canAddEvents}/>
     </>
 }

@@ -17,7 +17,7 @@ public class UserService {
     private final CalendarUserMapper calendarUserMapper;
 
     // todo add tests
-    public Page<CalendarUserDTO> findAll(Pageable pageable) {
+    public Page<CalendarUserDTO> findAllPageable(Pageable pageable) {
         return calendarUserRepository.findAll(pageable).map(calendarUserMapper::toDTO);
     }
 }

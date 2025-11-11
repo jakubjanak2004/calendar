@@ -18,6 +18,6 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<CalendarUserDTO>> getAllUsers(Pageable pageable) {
-        return ResponseEntity.ok(userService.findAll(pageable));
+        return ResponseEntity.ok(userService.findAllPageable(pageable));
     }
 }

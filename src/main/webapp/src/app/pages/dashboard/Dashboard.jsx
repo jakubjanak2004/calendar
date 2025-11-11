@@ -18,6 +18,6 @@ export function Dashboard() {
         </header>
         <Link to={"/groups"}>Groups</Link><br/>
         <Link to={"/invitations"}>Invitations</Link>
-        <Calendar eventOwnerId={userId}/>
+        <Calendar eventOwnerId={userId} canAddEvents={true}/>
     </>
 }

@@ -17,4 +17,9 @@ public class UserSecurity {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(auth.getName()).orElseThrow();
         return calendarUserId.equals(calendarUser.getId());
     }
+
+    public boolean isUser(String username, Authentication auth) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(auth.getName()).orElseThrow();
+        return username.equals(calendarUser.getUsername());
+    }
 }

@@ -2,9 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.response.CalendarUserDTO;
 import com.example.demo.dto.response.UserGroupDTO;
-import com.example.demo.model.CalendarUser;
 import com.example.demo.model.MembershipRole;
-import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,14 +23,16 @@ import java.util.UUID;
 @RequestMapping("/groups")
 @RequiredArgsConstructor
 public class GroupController {
-    // todo remove repositories from controller
-    private final CalendarUserRepository calendarUserRepository;
     private final GroupService groupService;
 
     @GetMapping
     public ResponseEntity<Page<UserGroupDTO>> getGroupsForUser(Pageable pageable, Principal principal) {
-        CalendarUser calendarUser = calendarUserRepository.findByUsername(principal.getName()).orElseThrow();
-        return ResponseEntity.ok(groupService.getAllGroupsForUserPageable(calendarUser.getId(), pageable));
+        return ResponseEntity.ok(groupService.getAllGroupsForUserPageable(principal.getName(), pageable));
+    }
+
+    @GetMapping("/invitations")
+    public ResponseEntity<List<UserGroupDTO>> getGroupInvitationsForUser(Principal principal) {
+        return ResponseEntity.ok(groupService.getGroupInvitationsForUser(principal.getName()));
     }
 
     @GetMapping("/{groupId}/users")
@@ -47,26 +47,30 @@ public class GroupController {
 
     @GetMapping("/{groupId}/users/me/membershipRole")
     public ResponseEntity<MembershipRole> getUserMembershipRole(@PathVariable UUID groupId, Principal principal) {
-        CalendarUser calendarUser = calendarUserRepository.findByUsername(principal.getName()).orElseThrow();
-        return ResponseEntity.ok(groupService.getMembershipRoleForUser(groupId, calendarUser));
+        return ResponseEntity.ok(groupService.getMembershipRoleForUserAndGroup(principal.getName(), groupId));
     }
 
     @DeleteMapping("/{groupId}/users/me")
     public ResponseEntity<Void> leaveGroup(@PathVariable UUID groupId, Principal principal) {
-        CalendarUser calendarUser = calendarUserRepository.findByUsername(principal.getName()).orElseThrow();
-        groupService.deleteUserFromGroup(groupId, calendarUser.getId());
+        groupService.deleteUserFromGroup(principal.getName(), groupId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{groupId}/users/me")
+    public ResponseEntity<Void> acceptInviteToGroup(@PathVariable UUID groupId, Principal principal) {
+        groupService.acceptInvitationForUserAndGroup(principal.getName(), groupId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{groupId}/users/{userId}")
     public ResponseEntity<Void> inviteUser(@PathVariable UUID groupId, @PathVariable UUID userId) {
-        groupService.inviteUserToGroup(groupId, userId);
+        groupService.inviteUserToGroup(userId, groupId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{groupId}/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID groupId, @PathVariable UUID userId) {
-        groupService.deleteUserFromGroup(groupId, userId);
+        groupService.deleteUserFromGroup(userId, groupId);
         return ResponseEntity.noContent().build();
     }
 }
