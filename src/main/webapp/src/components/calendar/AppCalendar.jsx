@@ -5,7 +5,7 @@ import {http} from "../../lib/http.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import EventComponent from "./EventComponent.jsx";
 
-export default function AppCalendar({eventOwnerId, canAddEvents}) {
+export default function AppCalendar({eventOwnerId, canManageEvents}) {
     const [events, setEvents] = useState([]);
     const [date, setDate] = useState(() => new Date());
     const [view, setView] = useState(Views.MONTH);
@@ -73,7 +73,7 @@ export default function AppCalendar({eventOwnerId, canAddEvents}) {
     };
 
     return <>
-        {canAddEvents && <Link to={`/${eventOwnerId}/addEvent`} className={"add-events-button"}>
+        {canManageEvents && <Link to={`/${eventOwnerId}/addEvent`} className={"add-events-button"}>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="black">
                 <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
             </svg>
@@ -92,7 +92,7 @@ export default function AppCalendar({eventOwnerId, canAddEvents}) {
                 event: EventComponent,
             }}
             eventPropGetter={setColor}
-            onDoubleClickEvent={handleDoubleClickEvent}
+            onDoubleClickEvent={canManageEvents ? handleDoubleClickEvent : undefined}
         />
     </>
 }

@@ -56,6 +56,6 @@ export default function UserGroupDetail() {
                 </li>
             ))}
         </ul>
-        <AppCalendar eventOwnerId={groupId} canAddEvents={canAddEvents}/>
+        <AppCalendar eventOwnerId={groupId} canManageEvents={canAddEvents}/>
     </>
 }

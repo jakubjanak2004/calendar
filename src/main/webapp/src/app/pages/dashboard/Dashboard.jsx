@@ -14,6 +14,6 @@ export function Dashboard() {
                 <InvitationsButton />
             </nav>
         </header>
-        <AppCalendar eventOwnerId={userId} canAddEvents={true}/>
+        <AppCalendar eventOwnerId={userId} canManageEvents={true}/>
     </>
 }
