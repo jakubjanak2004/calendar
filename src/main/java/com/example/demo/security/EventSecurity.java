@@ -34,6 +34,25 @@ public class EventSecurity {
         return canUserEditEventOwner(calendarUser, eventOwner);
     }
 
+    public boolean canAccessEventOwner(UUID eventOwnerId, Authentication auth) {
+        CalendarUser calendarUser = calendarUserRepository.findByUsername(auth.getName()).orElseThrow();
+        EventOwner eventOwner = eventOwnerRepository.findById(eventOwnerId).orElseThrow();
+        return canUserAccessEventOwner(calendarUser, eventOwner);
+    }
+
+    // todo maybe add the methods can access and canHandle directly to the event owner class
+    private boolean canUserAccessEventOwner(CalendarUser calendarUser, EventOwner eventOwner) {
+        if (eventOwner instanceof CalendarUser) {
+            return calendarUser.getId().equals(eventOwner.getId());
+        }
+        if (eventOwner instanceof UserGroup) {
+            return groupMembershipRepository.existsByGroupIdAndUserIdAndMembershipRoleNotIn(
+                    eventOwner.getId(), calendarUser.getId(), List.of(MembershipRole.INVITED)
+            );
+        }
+        return false;
+    }
+
     private boolean canUserEditEventOwner(CalendarUser calendarUser, EventOwner eventOwner) {
         if (eventOwner instanceof CalendarUser) {
             return calendarUser.getId().equals(eventOwner.getId());

@@ -31,8 +31,8 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @WithMockUser
-@Import({EventSystemTest.MethodSec.class, EventSecurity.class})
-public class EventSystemTest extends SystemTest {
+@Import({EventServiceTest.MethodSec.class, EventSecurity.class})
+public class EventServiceTest extends SystemTest {
     private static final String EVENT_OWNER_USERNAME = "test";
     private final Generator generator;
     private final EventRepository eventRepository;
@@ -44,7 +44,7 @@ public class EventSystemTest extends SystemTest {
     private UserGroupRepository userGroupRepository;
 
     @Autowired
-    public EventSystemTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
+    public EventServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
         this.generator = generator;
         this.calendarUserRepository = calendarUserRepository;
         this.eventRepository = eventRepository;
@@ -114,7 +114,7 @@ public class EventSystemTest extends SystemTest {
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void createEventThrowsAuthorizationDeniedExceptionWhenUserIsNotAuthorizedToEditEventOwner() {
-        EventOwner eventOwner =  userGroupRepository.save(new UserGroup("Group"));
+        EventOwner eventOwner =  userGroupRepository.save(generator.createUserGroup("Group"));
         EventRequestDTO eventRequestDTO = new EventRequestDTO(
                 "title",
                 "description",
@@ -127,7 +127,7 @@ public class EventSystemTest extends SystemTest {
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void createEventThrowsConstraintViolationExceptionWhenEndTimeIsBeforeStartTime() {
-        UserGroup userGroup = userGroupRepository.save(new UserGroup("Group"));
+        UserGroup userGroup = userGroupRepository.save(generator.createUserGroup("Group"));
         userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.EDITOR);
         UUID groupId = userGroupRepository.save(userGroup).getId();
         EventRequestDTO eventRequestDTO = new EventRequestDTO(
@@ -142,7 +142,7 @@ public class EventSystemTest extends SystemTest {
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void createEventCreatesNewEventForEventOwner() {
-        UserGroup userGroup = userGroupRepository.save(new UserGroup("group"));
+        UserGroup userGroup = userGroupRepository.save(generator.createUserGroup("Group"));
         userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.EDITOR);
         userGroupRepository.save(userGroup);
         EventRequestDTO eventRequestDTO = new EventRequestDTO(

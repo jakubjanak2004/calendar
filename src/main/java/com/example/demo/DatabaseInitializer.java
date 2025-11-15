@@ -29,7 +29,7 @@ public class DatabaseInitializer implements CommandLineRunner {
     public void run(String... args) {
         // create admin user
         CalendarUser calendarUser = generator.createUser("admin", "admin");
-        List<CalendarUser> calendarUsers = generator.createUsers("user", "admin", 5);
+        List<CalendarUser> calendarUsers = generator.createUsers("user", "admin", 11);
         calendarUserRepository.save(calendarUser);
         calendarUserRepository.saveAll(calendarUsers);
         // create events for admin user
@@ -40,7 +40,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         );
         eventRepository.saveAll(events);
         // create groups for users
-        UserGroup userGroup = new UserGroup(List.of(calendarUser), "first group");
+        UserGroup userGroup = UserGroup.initGroupWithAdminUsers(List.of(calendarUser), "first group");
         userGroupRepository.save(userGroup);
         // add group events
         List<Event> eventsForUserGroup = generator.createEvents(

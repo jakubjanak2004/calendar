@@ -14,12 +14,14 @@ import java.util.UUID;
 public interface GroupMembershipRepository extends JpaRepository<GroupMembership, Long> {
     boolean existsByGroupIdAndUserIdAndMembershipRoleIn(UUID groupId, UUID userId, List<MembershipRole> types);
     boolean existsByGroupIdAndUserIdAndMembershipRoleNotIn(UUID groupId, UUID userId, List<MembershipRole> types);
-    Optional<GroupMembership> findGroupMembershipByGroupAndUser(UserGroup group, CalendarUser user);
+    boolean existsByUserIdAndMembershipRoleIn(UUID userId, List<MembershipRole> types);
 
+    Optional<GroupMembership> findGroupMembershipByGroupAndUser(UserGroup group, CalendarUser user);
     List<GroupMembership> findAllByGroupAndMembershipRoleNot(UserGroup group, MembershipRole role);
+    List<GroupMembership> findAllByGroupAndUserNotAndMembershipRoleNot(UserGroup group, CalendarUser exceptUser, MembershipRole role);
     List<GroupMembership> findAllByGroupAndMembershipRole(UserGroup userGroup, MembershipRole membershipRole);
+
     Collection<GroupMembership> findAllByUserAndMembershipRole(CalendarUser calendarUser, MembershipRole membershipRole);
 
-    void deleteByGroupAndUser(UserGroup group, CalendarUser user);
     Optional<GroupMembership> findByGroupAndUser(UserGroup group, CalendarUser user);
 }

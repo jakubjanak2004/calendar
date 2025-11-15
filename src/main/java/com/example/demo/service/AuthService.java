@@ -56,11 +56,8 @@ public class AuthService {
 
     private String generateToken(UserDetails userDetails) {
         Instant now = Instant.now();
-
         JwtClaimsSet claims = JwtClaimsSet.builder().issuer(jwtProps.issuer()).issuedAt(now).expiresAt(now.plus(jwtProps.accessTtl())).subject(userDetails.getUsername()).build();
-
         JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
-
         return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
     }
 

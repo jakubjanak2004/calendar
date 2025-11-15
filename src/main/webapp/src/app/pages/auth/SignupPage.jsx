@@ -17,14 +17,14 @@ const usernameSchema = z
     .max(20, "Max 20 chars")
     .superRefine(async (u, ctx) => {
         const val = u.trim();
-        if (val.length < 5) return; // let length rule handle it
+        if (val.length < 5) return;
         try {
             const ok = await isUsernameAvailable(val);
             if (!ok) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "Username is already taken",
-                }); // attaches to "username" itself
+                });
             }
         } catch {
             // Optional: show a soft error instead of blocking
@@ -32,7 +32,6 @@ const usernameSchema = z
         }
     });
 
-// --- object schema with sync password match
 const schema = z
     .object({
         firstName: z.string().trim().max(100, "Minimal length is 100 characters").min(1, "First name is required"),
@@ -79,14 +78,18 @@ export function SignupPage() {
             password: data.password
         });
         const token = res.data.token;
-        login(token, data.username, data.firstName, data.lastName);
+        const userId = res.data.userId;
+        const username = res.data.username;
+        const firstName = res.data.firstName;
+        const lastName = res.data.lastName
+        login(token, userId, username, firstName, lastName)
         reset();
         navigate("/", { replace: true });
     }
 
     return (
         <>
-            <header><Link to="/login">Log in</Link></header>
+            <header><Link to="/login">Log In</Link></header>
             <h1 className="main-header">Signup page</h1>
 
             <form onSubmit={handleSubmit(onSubmit)} className="auth-form" noValidate>
@@ -108,10 +111,20 @@ export function SignupPage() {
                 />
                 {errors.username && <p role="alert">{errors.username.message}</p>}
 
-                <input type="password" placeholder="password" autoComplete="new-password" {...register("password")} />
+                <input
+                    type="password"
+                    placeholder="password"
+                    autoComplete="new-password"
+                    {...register("password")}
+                />
                 {errors.password && <p role="alert">{errors.password.message}</p>}
 
-                <input type="password" placeholder="repeat password" {...register("passwordRepeat")} />
+                <input
+                    type="password"
+                    placeholder="repeat password"
+                    autoComplete="new-password"
+                    {...register("passwordRepeat")}
+                />
                 {errors.passwordRepeat && <p role="alert">{errors.passwordRepeat.message}</p>}
 
                 <input type="submit" value={isSubmitting ? "Signing up…" : "Sign In"} disabled={isSubmitting} />

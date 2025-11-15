@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.request.CreateGroupDTO;
 import com.example.demo.dto.response.CalendarUserDTO;
+import com.example.demo.dto.response.GroupCalendarUserDTO;
 import com.example.demo.dto.response.UserGroupDTO;
 import com.example.demo.model.MembershipRole;
 import com.example.demo.service.GroupService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,13 +33,18 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllGroupsForUserPageable(principal.getName(), pageable));
     }
 
+    @PostMapping
+    public ResponseEntity<UserGroupDTO> createGroup(@RequestBody CreateGroupDTO createGroupDTO, Principal principal) {
+        return ResponseEntity.ok(groupService.createNewGroup(createGroupDTO, principal.getName()));
+    }
+
     @GetMapping("/invitations")
     public ResponseEntity<List<UserGroupDTO>> getGroupInvitationsForUser(Principal principal) {
         return ResponseEntity.ok(groupService.getGroupInvitationsForUser(principal.getName()));
     }
 
     @GetMapping("/{groupId}/users")
-    public ResponseEntity<List<CalendarUserDTO>> getAllUsersForGroup(@PathVariable UUID groupId) {
+    public ResponseEntity<List<GroupCalendarUserDTO>> getAllUsersForGroup(@PathVariable UUID groupId) {
         return ResponseEntity.ok(groupService.getAllUsersForGroupExcludingInvited(groupId));
     }
 
@@ -52,7 +60,7 @@ public class GroupController {
 
     @DeleteMapping("/{groupId}/users/me")
     public ResponseEntity<Void> leaveGroup(@PathVariable UUID groupId, Principal principal) {
-        groupService.deleteUserFromGroup(principal.getName(), groupId);
+        groupService.leaveGroup(principal.getName(), groupId);
         return ResponseEntity.noContent().build();
     }
 

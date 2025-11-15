@@ -28,7 +28,7 @@ public class EventService {
     private final EventRequestMapper eventRequestMapper;
     private final EventOwnerRepository eventOwnerRepository;
 
-    @PreAuthorize("@eventSecurity.canEditEventOwner(#eventOwnerId, authentication)")
+    @PreAuthorize("@eventSecurity.canAccessEventOwner(#eventOwnerId, authentication)")
     public List<EventDTO> getAllEventsInRangeForEventOwner(UUID eventOwnerId, Instant startInstant, Instant endInstant) {
         return eventRepository.findByEventOwnerIdAndEndTimeGreaterThanEqualAndStartTimeLessThanEqual(eventOwnerId, startInstant, endInstant).stream()
                 .map(eventMapper::toDTO)
@@ -52,5 +52,13 @@ public class EventService {
     @PreAuthorize("@eventSecurity.isOwner(#eventId, authentication)")
     public void deleteEvent(UUID eventId) {
         eventRepository.deleteById(eventId);
+    }
+
+    // todo add tests
+    @PreAuthorize("@eventSecurity.isOwner(#eventId, authentication)")
+    public EventDTO getEvent(UUID eventId) {
+        return eventRepository.findById(eventId)
+                .map(eventMapper::toDTO)
+                .orElseThrow();
     }
 }

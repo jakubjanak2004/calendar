@@ -52,7 +52,7 @@ export function LoginPage() {
                 autoComplete="password"
                 required
             />
-            <input type="submit" value={"LogIn"}/>
+            <input type="submit" value={"Log In"}/>
         </form>
         <p role="alert">
             {error}
