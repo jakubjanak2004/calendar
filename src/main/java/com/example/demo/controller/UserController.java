@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -19,5 +21,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<CalendarUserDTO>> getAllUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.findAllPageable(pageable));
+    }
+
+    @GetMapping("/me/invitations/exists")
+    public ResponseEntity<Boolean> getInvitationsExist(Principal principal) {
+        return ResponseEntity.ok(userService.hasAnyInvitations(principal.getName()));
     }
 }

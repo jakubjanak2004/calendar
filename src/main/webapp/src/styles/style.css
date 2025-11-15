@@ -5,15 +5,79 @@
 }
 
 :root {
-    --header-height: 40px;
+    --min-header-height: 40px;
+    --add-events-height: 40px;
+}
+
+body {
+    background-color: whitesmoke;
 }
 
 .main-header {
     text-align: center;
 }
 
+a {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+p {
+    margin: 10px 0;
+    text-align: center;
+}
+
 header {
-    height: var(--header-height);
+    min-height: var(--min-header-height);
+    padding: 10px 0;
+
+    &.sticky {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04));
+        box-shadow: 0 5px 20px rgba(0, 0, 0, .20);
+        backdrop-filter: blur(14px) saturate(120%);
+        -webkit-backdrop-filter: blur(14px) saturate(120%);
+    }
+
+    & > a, & > button {
+        background-color: #efefef;
+        border: 1px solid black;
+        border-radius: 3px;
+        padding: 2px 5px;
+        text-decoration: none;
+        color: black;
+        margin: 10px;
+        display: inline-block;
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-evenly;
+
+        .button {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    }
+}
+
+svg {
+    width: 50px;
 }
 
 h1 {
@@ -51,6 +115,7 @@ form {
 .auth-form {
     input {
     }
+
     input[type="submit"] {
     }
 }
@@ -64,7 +129,6 @@ p[role="alert"] {
 #dashboard {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - var(--header-height));
 }
 
 #calendar {
@@ -117,6 +181,7 @@ p[role="alert"] {
         .content {
             display: none;
         }
+
         button {
             display: none;
         }
@@ -183,11 +248,13 @@ p[role="alert"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
     input {
         background: none;
         border: none;
         padding-top: 5px;
     }
+
     input[type="submit"] {
         background-color: blue;
         color: white;
@@ -198,16 +265,92 @@ p[role="alert"] {
 }
 
 /* addEvent */
-/* todo */
+.add-events-button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: var(--add-events-height);
+    margin: 0 20px 0 auto;
+    /*margin: 10px 20px 10px auto;*/
+
+    svg {
+        height: 40px;
+    }
+}
 
 /* Group */
-.group-li {
-    border: 1px solid black;
-    border-radius: 10px;
+.li-element {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    width: 95%;
+    margin: 5px auto;
     padding: 10px;
+    background-color: white;
 
     P {
-        /*text-align: center*/
+        padding-left: 10px;
+        text-align: left;
         font-size: 18px;
     }
+}
+
+.pagination {
+    margin-bottom: 30px;
+}
+
+.remove-button {
+    margin-left: auto;
+    margin-right: 10px;
+    padding: 3px 10px;
+    background-color: #ff9d9d;
+    border: 1px solid red;
+    color: red;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 200ms ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.invite-button {
+    margin-left: auto;
+    margin-right: 10px;
+    padding: 3px 10px;
+    background-color: #adffad;
+    border: 1px solid green;
+    color: green;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 200ms ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.membership-role {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.membership-role[data-role="ADMIN"] {
+    color: red;
+    font-weight: 600;
+}
+
+.membership-role[data-role="EDITOR"] {
+    color: orange;
+}
+
+.membership-role[data-role="MEMBER"] {
+    color: #111;
+}
+
+/* calendar */
+.rbc-calendar {
+    height: 85vh;
 }

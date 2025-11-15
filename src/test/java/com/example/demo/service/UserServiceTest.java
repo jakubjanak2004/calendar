@@ -10,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-public class UserSystemTest extends SystemTest {
+public class UserServiceTest extends SystemTest {
     private final Generator generator;
     private final CalendarUserRepository userRepository;
     private final UserService userService;
 
     @Autowired
-    public UserSystemTest(Generator generator, CalendarUserRepository userRepository, UserService userService) {
+    public UserServiceTest(Generator generator, CalendarUserRepository userRepository, UserService userService) {
         this.generator = generator;
         this.userRepository = userRepository;
         this.userService = userService;

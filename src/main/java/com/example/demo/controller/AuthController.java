@@ -37,9 +37,8 @@ public class AuthController {
         return ResponseEntity.ok(authResponseDTO);
     }
 
-    // todo the return type of the response entity
     @GetMapping("/usernameTaken")
-    public ResponseEntity<?> usernameTaken(@RequestParam("username") String username) {
+    public ResponseEntity<Boolean> usernameTaken(@RequestParam("username") String username) {
         return ResponseEntity.ok(authService.usernameTaken(username));
     }
 }

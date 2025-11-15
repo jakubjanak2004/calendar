@@ -1,23 +1,19 @@
-import {Link, useNavigate} from "react-router-dom";
+import AppCalendar from "../../../components/calendar/AppCalendar.jsx";
+import GroupsButton from "../../../components/buttons/GroupsButton.jsx";
+import InvitationsButton from "../../../components/buttons/InvitationsButton.jsx";
+import SignOutButton from "../../../components/buttons/SignOutButton.jsx";
 import {useAuth} from "../../../features/AuthContext.jsx";
-import Calendar from "../../../components/calendar/Calendar.jsx";
 
 export function Dashboard() {
-    const navigate = useNavigate();
-    const {logout, userId} = useAuth()
-
-    function handleSignOut(e) {
-        e.preventDefault();
-        logout()
-        navigate("/", { replace: true });
-    }
-
+    const {userId} = useAuth()
     return <>
         <header>
-            <button onClick={handleSignOut}>Sign Out</button>
+            <nav>
+                <SignOutButton />
+                <GroupsButton />
+                <InvitationsButton />
+            </nav>
         </header>
-        <Link to={"/groups"}>Groups</Link><br/>
-        <Link to={"/invitations"}>Invitations</Link>
-        <Calendar eventOwnerId={userId} canAddEvents={true}/>
+        <AppCalendar eventOwnerId={userId} canAddEvents={true}/>
     </>
 }

@@ -1,4 +1,4 @@
-# Calendar Application
+# AppCalendar Application
 
 This is a calendar application. The documentation starts with the problem analysis and then continues with the app design.
 
@@ -7,7 +7,7 @@ FR1 — Authentication
 * A user can log in to their account using a username and password.
 * The system must return an access and refresh token on successful login.
 
-FR2 — Personal Calendar (read)
+FR2 — Personal AppCalendar (read)
 * A user can view their personal calendar, which aggregates their personal events and events from groups they belong to.
 * The calendar supports day and month views and a time-zone–aware agenda list.
 

@@ -1,6 +1,7 @@
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {useState} from "react";
-import {http} from "../../lib/http.jsx";
+import {useEffect, useState} from "react";
+import {http} from "../../../lib/http.jsx";
+import BackButton from "../../../components/buttons/BackButton.jsx";
 
 function toLocalInputValue(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -21,11 +22,17 @@ export function AddEventPage() {
     const [startTime, setStartTime] = useState(toLocalInputValue(new Date()));
     const [endTime, setEndTime] = useState(toLocalInputValue(new Date()));
     const { eventOwnerId } = useParams();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
+    // when start time changed and end time is before start time shift it to start time
+    useEffect(() => {
+        if (toIso(endTime) < toIso(startTime)) {
+            setEndTime(startTime)
+        }
+    }, [startTime]);
 
     async function createNewEvent(e) {
         e.preventDefault()
-        console.log(eventOwnerId)
         const res = await http.client.post(`/eventOwners/${eventOwnerId}/events`,
             {
                 title,
@@ -43,7 +50,9 @@ export function AddEventPage() {
     }
 
     return <>
-        <button onClick={navigateBack}>Back</button>
+        <header>
+            <BackButton />
+        </header>
         <h1>Create New Event</h1>
         <form id={"add-event"} onSubmit={createNewEvent}>
             <input

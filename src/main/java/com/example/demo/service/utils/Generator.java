@@ -3,6 +3,11 @@ package com.example.demo.service.utils;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.Event;
 import com.example.demo.model.EventOwner;
+import com.example.demo.model.MembershipRole;
+import com.example.demo.model.UserGroup;
+import com.example.demo.repository.CalendarUserRepository;
+import com.example.demo.repository.EventRepository;
+import com.example.demo.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -11,6 +16,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -20,6 +26,9 @@ import java.util.stream.IntStream;
 public class Generator {
     private static final Random RANDOM = new Random();
     private final PasswordEncoder passwordEncoder;
+    private final CalendarUserRepository calendarUserRepository;
+    private final UserGroupRepository userGroupRepository;
+    private final EventRepository eventRepository;
 
     public static String createStringAttribute(String attributeName) {
         return attributeName + " " + RANDOM.nextDouble(0, 10);
@@ -30,12 +39,7 @@ public class Generator {
     }
 
     public CalendarUser createUser(String password) {
-        return createUser(
-                createStringAttribute("firstName"),
-                createStringAttribute("lastName"),
-                createStringAttribute("username"),
-                password
-        );
+        return createUser(createStringAttribute("firstName"), createStringAttribute("lastName"), createStringAttribute("username"), password);
     }
 
     public CalendarUser createUser(String username, String password) {
@@ -45,12 +49,7 @@ public class Generator {
     }
 
     public CalendarUser createUser(String firstName, String lastName, String username, String password) {
-        return new CalendarUser(
-                firstName,
-                lastName,
-                username,
-                passwordEncoder.encode(password)
-        );
+        return calendarUserRepository.save(new CalendarUser(firstName, lastName, username, passwordEncoder.encode(password)));
     }
 
     public Event createEvent(EventOwner eventOwner, int daysOffset, int eventDurationMinutes) {
@@ -58,21 +57,11 @@ public class Generator {
         ZonedDateTime now = ZonedDateTime.now(zone);
         ZonedDateTime startDateTime = now.plusDays(daysOffset);
         ZonedDateTime endDateTime = startDateTime.plusMinutes(eventDurationMinutes);
-        return createEvent(
-                eventOwner,
-                startDateTime.toInstant(),
-                endDateTime.toInstant()
-        );
+        return createEvent(eventOwner, startDateTime.toInstant(), endDateTime.toInstant());
     }
 
     public Event createEvent(EventOwner eventOwner, Instant startTime, Instant endTime) {
-        return new Event(
-                eventOwner,
-                createStringAttribute("title"),
-                createStringAttribute("description"),
-                startTime,
-                endTime
-        );
+        return eventRepository.save(new Event(eventOwner, createStringAttribute("title"), createStringAttribute("description"), startTime, endTime));
     }
 
     public List<Event> createEvents(EventOwner eventOwner, List<Integer> daysOffsets, List<Integer> eventDurationMinutes) {
@@ -88,8 +77,21 @@ public class Generator {
     }
 
     public List<CalendarUser> createUsers(String usernameStart, String password, int n) {
-        return IntStream.rangeClosed(1, n)
-                .mapToObj(i -> createUser(createStringAttribute(usernameStart), password))
-                .toList();
+        return IntStream.rangeClosed(1, n).mapToObj(i -> createUser(createStringAttribute(usernameStart), password)).toList();
+    }
+
+    public UserGroup createUserGroup(String groupName) {
+        CalendarUser adminCalendarUser = createUser();
+        return createUserGroup(groupName, adminCalendarUser, List.of());
+    }
+
+    public UserGroup createUserGroup(String groupName, CalendarUser adminCalendarUser) {
+        return createUserGroup(groupName, adminCalendarUser, List.of());
+    }
+
+    public UserGroup createUserGroup(String groupName, CalendarUser adminCalendarUser, List<CalendarUser> memberCalendarUsers) {
+        UserGroup userGroup = UserGroup.initGroupWithAdminUsers(List.of(adminCalendarUser), groupName);
+        userGroup.addCalendarUsersToGroup(memberCalendarUsers, MembershipRole.MEMBER);
+        return userGroupRepository.save(userGroup);
     }
 }
