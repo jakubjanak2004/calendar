@@ -1,7 +1,7 @@
 import {Link, useNavigate} from "react-router-dom";
 import {http} from "../../../lib/http.jsx";
 import {useState} from "react";
-import {useAuth} from "../../../features/AuthContext.jsx";
+import {useAuth} from "../../../context/AuthContext.jsx";
 
 export function LoginPage() {
     const {login} = useAuth()
@@ -44,6 +44,7 @@ export function LoginPage() {
                 onChange={e => setUsername(e.target.value)}
                 autoComplete="username"
                 required
+                autoFocus
             />
             <input
                 type="password"

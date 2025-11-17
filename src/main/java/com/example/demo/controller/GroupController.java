@@ -43,6 +43,11 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupInvitationsForUser(principal.getName()));
     }
 
+    @GetMapping("/{groupId}")
+    public ResponseEntity<UserGroupDTO> getUserGroup(@PathVariable UUID groupId) {
+        return ResponseEntity.ok(groupService.getUserGroup(groupId));
+    }
+
     @GetMapping("/{groupId}/users")
     public ResponseEntity<List<GroupCalendarUserDTO>> getAllUsersForGroup(@PathVariable UUID groupId) {
         return ResponseEntity.ok(groupService.getAllUsersForGroupExcludingInvited(groupId));

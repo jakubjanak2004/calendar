@@ -16,12 +16,14 @@ import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
 import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.security.UserSecurity;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class GroupService {
     private final UserGroupRepository groupRepository;
     private final UserGroupMapper userGroupMapper;
@@ -134,11 +137,18 @@ public class GroupService {
     }
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
-    public UserGroupDTO createNewGroup(CreateGroupDTO createGroupDTO, String username) {
+    public UserGroupDTO createNewGroup(@Valid CreateGroupDTO createGroupDTO, String username) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
         UserGroup userGroup = createGroupMapper.toEntity(createGroupDTO);
         userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.ADMIN);
         userGroupRepository.save(userGroup);
         return userGroupMapper.toDTO(userGroup);
+    }
+
+    // todo add tests
+    public UserGroupDTO getUserGroup(UUID groupId) {
+        return userGroupRepository.findById(groupId)
+                .map(userGroupMapper::toDTO)
+                .orElseThrow();
     }
 }

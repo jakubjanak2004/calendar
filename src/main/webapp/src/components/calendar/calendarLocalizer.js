@@ -7,6 +7,7 @@ import {
 } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 
+// todo determine locale dynamically
 const locales = {
     'en-US': enUS,
 };

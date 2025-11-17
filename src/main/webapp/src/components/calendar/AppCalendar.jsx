@@ -4,12 +4,26 @@ import {localizer} from "./calendarLocalizer";
 import {http} from "../../lib/http.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import EventComponent from "./EventComponent.jsx";
+import {useEvents} from "../../context/EventContext.jsx";
 
 export default function AppCalendar({eventOwnerId, canManageEvents}) {
-    const [events, setEvents] = useState([]);
+    const {setEventsForOwner, eventsByOwner} = useEvents();
     const [date, setDate] = useState(() => new Date());
     const [view, setView] = useState(Views.MONTH);
     const navigate = useNavigate()
+
+    let userEvents = eventsByOwner[eventOwnerId] || {};
+    let eventsArray = Object.values(userEvents)
+        .map(e => ({
+            title: e.title,
+            description: e.description,
+            start: new Date(e.startTime),
+            end: new Date(e.endTime),
+            allDay: e.allDay ?? false,
+            color: "#0650bc",
+            selectedColor: "#205db6",
+            resource: e,
+        }))
 
     const fetchEventsForRange = async (startDate, endDate) => {
         const start = startDate.toISOString();
@@ -19,18 +33,7 @@ export default function AppCalendar({eventOwnerId, canManageEvents}) {
             `eventOwners/${eventOwnerId}/events/${encodeURIComponent(start)}/${encodeURIComponent(end)}`
         );
 
-        setEvents(
-            res.data.map(e => ({
-                title: e.title,
-                description: e.description,
-                start: new Date(e.startTime),
-                end: new Date(e.endTime),
-                allDay: e.allDay ?? false,
-                color: "#ff0000",
-                selectedColor: "#000000",
-                resource: e,
-            }))
-        );
+        setEventsForOwner(eventOwnerId, res.data)
     };
 
     useEffect(() => {
@@ -69,18 +72,27 @@ export default function AppCalendar({eventOwnerId, canManageEvents}) {
 
     const handleDoubleClickEvent = (event) => {
         const id = event.resource.id;
-        navigate(`/events/${id}`);
+        navigate(`event/${id}`);
     };
 
     return <>
-        {canManageEvents && <Link to={`/${eventOwnerId}/addEvent`} className={"add-events-button"}>
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="black">
-                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
-            </svg>
-        </Link>}
+        {canManageEvents &&
+            <div className={"add-events-button"}>
+                <Link
+                    to={`eventOwner/${eventOwnerId}/addEvent`}
+                    className={"add-events-button"}
+                    title="Add Event"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                         fill="black">
+                        <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+                    </svg>
+                </Link>
+            </div>
+        }
         <Calendar
             localizer={localizer}
-            events={events}
+            events={eventsArray}
             date={date}
             view={view}
             onNavigate={handleNavigate}

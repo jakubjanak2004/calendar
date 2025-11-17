@@ -2,8 +2,7 @@ import {useParams} from "react-router-dom";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {http} from "../../../lib/http.jsx";
 import CalendarUser from "../../../components/users/CalendarUser.jsx";
-import {useAuth} from "../../../features/AuthContext.jsx";
-import BackButton from "../../../components/buttons/BackButton.jsx";
+import {useAuth} from "../../../context/AuthContext.jsx";
 
 // todo add membership role administration, that an admin can change usersMembershipRoles
 export default function ManageMembersPage() {
@@ -126,9 +125,6 @@ export default function ManageMembersPage() {
     const inviteCandidates = useMemo(() => users.filter(u => u.id !== currentUserId && !memberIdSet.has(u.id) && !invitedIdSet.has(u.id)), [users, currentUserId, memberIdSet, invitedIdSet]);
 
     return <>
-        <header>
-            <BackButton/>
-        </header>
         <h2 className="text-xl font-semibold mb-2">Current members</h2>
         <ul className="space-y-2 mb-6">
             {loadingMembers && <li className="text-sm text-gray-500">Loading members…</li>}

@@ -1,14 +1,14 @@
 import { http } from "../../../lib/http.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import {useAuth} from "../../../features/AuthContext.jsx";
+import {useAuth} from "../../../context/AuthContext.jsx";
 
 export default function AddGroupPage() {
     const [name, setName] = useState("");
-    const [usersIdsList, setUsersIdsList] = useState([]); // selected user IDs
+    const [usersIdsList, setUsersIdsList] = useState([]);
     const {userId} = useAuth()
 
-    const [users, setUsers] = useState([]); // current page of users
+    const [users, setUsers] = useState([]);
     const [page, setPage] = useState(0);
     const [size] = useState(10);
     const [last, setLast] = useState(true);

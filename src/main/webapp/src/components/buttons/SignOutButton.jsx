@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../features/AuthContext.jsx";
+import {useAuth} from "../../context/AuthContext.jsx";
 
+// todo add title to all the buttons
 export default function SignOutButton() {
     const navigate = useNavigate();
     const {logout} = useAuth()
@@ -15,7 +16,11 @@ export default function SignOutButton() {
     }
 
     return <>
-        <button className={"button"} onClick={handleSignOut}>
+        <button
+            className={"button"}
+            onClick={handleSignOut}
+            title="Sign out from your account"
+        >
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
                  fill="block">
                 <path

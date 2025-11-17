@@ -1,7 +1,5 @@
-import {Link, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {http} from "../../../lib/http.jsx";
-import BackButton from "../../../components/buttons/BackButton.jsx";
+import {http} from "../../lib/http.jsx";
 
 function toLocalInputValue(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -16,45 +14,39 @@ function toLocalInputValue(date) {
 
 const toIso = (local) => new Date(local).toISOString();
 
-export function AddEventPage() {
+export default function EventForm({onSubmitCallback, eventId, submitButtonValue}) {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [startTime, setStartTime] = useState(toLocalInputValue(new Date()));
     const [endTime, setEndTime] = useState(toLocalInputValue(new Date()));
-    const { eventOwnerId } = useParams();
-    const navigate = useNavigate();
 
-    // when start time changed and end time is before start time shift it to start time
+    async function onSubmitHandle(e) {
+        e.preventDefault()
+        onSubmitCallback(title, description, toIso(startTime), toIso(endTime))
+    }
+
+    async function loadEvent() {
+        const res = await http.client.get(`events/${eventId}`)
+        const data = res.data
+        setTitle(data.title)
+        setDescription(data.description)
+        setStartTime(toLocalInputValue(new Date(data.startTime)))
+        setEndTime(toLocalInputValue(new Date(data.endTime)))
+    }
+
+    useEffect(() => {
+        if (!eventId) return;
+        loadEvent().finally();
+    }, [])
+
     useEffect(() => {
         if (toIso(endTime) < toIso(startTime)) {
             setEndTime(startTime)
         }
     }, [startTime]);
 
-    async function createNewEvent(e) {
-        e.preventDefault()
-        const res = await http.client.post(`/eventOwners/${eventOwnerId}/events`,
-            {
-                title,
-                description,
-                startTime: toIso(startTime),
-                endTime: toIso(endTime)
-            }
-        )
-        // todo later add the event into the global event handling
-        navigateBack()
-    }
-
-    function navigateBack() {
-        navigate(-1)
-    }
-
     return <>
-        <header>
-            <BackButton />
-        </header>
-        <h1>Create New Event</h1>
-        <form id={"add-event"} onSubmit={createNewEvent}>
+        <form id={"add-event"} onSubmit={onSubmitHandle}>
             <input
                 type="text"
                 value={title}
@@ -80,7 +72,7 @@ export function AddEventPage() {
                 onChange={e => setEndTime(e.target.value)}
                 required
             />
-            <input type="submit" value={"Create"}/>
+            <input type="submit" value={submitButtonValue}/>
         </form>
     </>
 }

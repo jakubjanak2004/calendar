@@ -8,6 +8,11 @@ export default function BackButton() {
     }
 
     return <>
-        <button onClick={navigateBack}>Back</button>
+        <button
+            onClick={navigateBack}
+            title="Go Back"
+        >
+            Back
+        </button>
     </>
 }
