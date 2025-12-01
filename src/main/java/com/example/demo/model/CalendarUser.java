@@ -45,6 +45,11 @@ public class CalendarUser extends EventOwner implements UserDetails {
         this.password = password;
     }
 
+    public void removeMembership(GroupMembership membership) {
+        groupMembershipList.remove(membership);
+        membership.setUser(null);
+    }
+
     @Override
     public String getUsername() {
         return username;

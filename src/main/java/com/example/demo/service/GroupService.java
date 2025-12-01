@@ -97,10 +97,11 @@ public class GroupService {
     private void deleteUserFromGroup(CalendarUser calendarUser, UserGroup userGroup) {
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
         MembershipRole membershipRole = groupMembership.getMembershipRole();
-        groupMembershipRepository.delete(groupMembership);
+        calendarUser.removeMembership(groupMembership);
+        userGroup.removeMembership(groupMembership);
         if (membershipRole == MembershipRole.ADMIN) {
             // removing ADMIN user
-            List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByGroupAndUserNotAndMembershipRoleNot(userGroup, calendarUser, MembershipRole.INVITED);
+            List<GroupMembership> groupMembershipList = userGroup.getGroupMembershipList();
             if (groupMembershipList.isEmpty()) {
                 // remove group if the last user being ADMIN left
                 groupRepository.delete(userGroup);

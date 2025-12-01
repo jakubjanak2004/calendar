@@ -54,6 +54,11 @@ public class UserGroup extends EventOwner {
         groupMembershipList.add(new GroupMembership(calendarUser, this, MembershipRole.INVITED));
     }
 
+    public void removeMembership(GroupMembership membership) {
+        groupMembershipList.remove(membership);
+        membership.setGroup(null);
+    }
+
     /**
      * Check for one ADMIN presence, note when changing the UserGroupMembership we can violate this
      * constraint therefore that needs to get checked in the Service layer

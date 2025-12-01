@@ -126,7 +126,7 @@ public class GroupServiceTest extends SystemTest {
         userGroup.addCalendarUsersToGroup(List.of(testUser), MembershipRole.EDITOR);
         userGroupRepository.save(userGroup);
         groupService.deleteUserFromGroup(calendarUser.getUsername(), userGroup.getId());
-        Assertions.assertEquals(1, groupService.getAllGroupsForUserPageable(calendarUser.getUsername(), PageRequest.of(0, 10)).getTotalElements());
+        Assertions.assertEquals(1, userGroupRepository.findById(userGroup.getId()).orElseThrow().getGroupMembershipList().size());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class GroupServiceTest extends SystemTest {
         userGroup.addCalendarUsersToGroup(List.of(testUser), MembershipRole.EDITOR);
         userGroupRepository.save(userGroup);
         groupService.deleteUserFromGroup(calendarUser.getId(), userGroup.getId());
-        Assertions.assertEquals(1, groupService.getAllGroupsForUserPageable(calendarUser.getUsername(), PageRequest.of(0, 10)).getTotalElements());
+        Assertions.assertEquals(1, userGroupRepository.findById(userGroup.getId()).orElseThrow().getGroupMembershipList().size());
     }
 
     @Test
@@ -176,6 +176,8 @@ public class GroupServiceTest extends SystemTest {
     public void leaveGroupRemovesUserFromGroup() {
         CalendarUser testUser = generator.createUser();
         UserGroup testGroup = generator.createUserGroup("Group", testUser, List.of(calendarUser));
+        long membershipCountBefore = groupMembershipRepository.countByGroup_Id(testGroup.getId());
+        Assertions.assertEquals(2, membershipCountBefore);
         groupService.leaveGroup(calendarUser.getUsername(), testGroup.getId());
         long membershipCount = groupMembershipRepository.countByGroup_Id(testGroup.getId());
         Assertions.assertEquals(1, membershipCount);
