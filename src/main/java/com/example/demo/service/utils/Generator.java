@@ -11,6 +11,7 @@ import com.example.demo.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -23,6 +24,7 @@ import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class Generator {
     private static final Random RANDOM = new Random();
     private final PasswordEncoder passwordEncoder;

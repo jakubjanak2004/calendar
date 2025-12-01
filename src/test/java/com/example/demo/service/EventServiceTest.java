@@ -33,7 +33,6 @@ import java.util.UUID;
 @WithMockUser
 @Import({EventServiceTest.MethodSec.class, EventSecurity.class})
 public class EventServiceTest extends SystemTest {
-    private static final String EVENT_OWNER_USERNAME = "test";
     private final Generator generator;
     private final EventRepository eventRepository;
     private final EventService eventService;
@@ -163,7 +162,7 @@ public class EventServiceTest extends SystemTest {
 
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
-    public void deleteEventThrowsExceptionWhenUserIsNotOwnerOfThatEvent() {
+    public void deleteEventThrowsAuthorizationDeniedExceptionWhenUserIsNotOwnerOfThatEvent() {
         CalendarUser calendarUser = calendarUserRepository.save(generator.createUser());
         Event event = eventRepository.save(
                 generator.createEvent(
@@ -209,6 +208,28 @@ public class EventServiceTest extends SystemTest {
         eventRepository.save(generator.createEvent(calendarUser, startTime.plus(10, ChronoUnit.MINUTES), endTime.minus(10, ChronoUnit.MINUTES)));
 
         Assertions.assertEquals(3, eventService.getAllEventsInRangeForEventOwner(calendarUser.getId(), startTime, endTime).size());
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventThrowsAuthorizationDeniedExceptionWhenUserIsNotOwnerOfThatEvent() {
+        CalendarUser testUser = calendarUserRepository.save(generator.createUser());
+        Event event = generator.createEvent(testUser, 5, 60);
+        Assertions.assertThrows(AuthorizationDeniedException.class, () -> eventService.getEvent(event.getId()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventThrowsNoSuchElementExceptionWhenEventDoesNotExist() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> eventService.getEvent(UUID.randomUUID()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventReturnsEventForUserThatIsOwnerOfThatEvent() {
+        Event event = generator.createEvent(calendarUser, 5, 60);
+        EventDTO eventDTO = eventService.getEvent(event.getId());
+        Assertions.assertEquals(event.getId(), eventDTO.getId());
     }
 
     @TestConfiguration

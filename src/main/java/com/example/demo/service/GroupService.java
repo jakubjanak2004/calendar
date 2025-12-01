@@ -41,7 +41,6 @@ public class GroupService {
     private final CalendarUserRepository calendarUserRepository;
     private final UserGroupRepository userGroupRepository;
     private final CreateGroupMapper createGroupMapper;
-    private final UserSecurity userSecurity;
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
     public Page<UserGroupDTO> getAllGroupsForUserPageable(String username, Pageable pageable) {
@@ -97,12 +96,16 @@ public class GroupService {
 
     private void deleteUserFromGroup(CalendarUser calendarUser, UserGroup userGroup) {
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
+        MembershipRole membershipRole = groupMembership.getMembershipRole();
         groupMembershipRepository.delete(groupMembership);
-        if (groupMembership.getMembershipRole() == MembershipRole.ADMIN) {
+        if (membershipRole == MembershipRole.ADMIN) {
+            // removing ADMIN user
             List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByGroupAndUserNotAndMembershipRoleNot(userGroup, calendarUser, MembershipRole.INVITED);
             if (groupMembershipList.isEmpty()) {
+                // remove group if the last user being ADMIN left
                 groupRepository.delete(userGroup);
             } else {
+                // pick new ADMIN from remaining users
                 GroupMembership newAdminMembership = groupMembershipList.getFirst();
                 newAdminMembership.setMembershipRole(MembershipRole.ADMIN);
                 groupMembershipRepository.save(newAdminMembership);
@@ -145,7 +148,6 @@ public class GroupService {
         return userGroupMapper.toDTO(userGroup);
     }
 
-    // todo add tests
     public UserGroupDTO getUserGroup(UUID groupId) {
         return userGroupRepository.findById(groupId)
                 .map(userGroupMapper::toDTO)

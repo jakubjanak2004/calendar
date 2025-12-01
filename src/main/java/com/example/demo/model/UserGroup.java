@@ -4,6 +4,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -20,11 +22,10 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-// todo add checker for admin presence - do not save to database without the admin being present
 public class UserGroup extends EventOwner {
     @Size(min = 1, message = "Group must have at least one member")
     @OneToMany(mappedBy = "group", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    private Set<GroupMembership> groupMembershipList = new HashSet<>();
+    private List<GroupMembership> groupMembershipList = new ArrayList<>();
 
     @NotBlank
     @Column(nullable = false)
@@ -51,5 +52,23 @@ public class UserGroup extends EventOwner {
 
     public void inviteUser(CalendarUser calendarUser) {
         groupMembershipList.add(new GroupMembership(calendarUser, this, MembershipRole.INVITED));
+    }
+
+    /**
+     * Check for one ADMIN presence, note when changing the UserGroupMembership we can violate this
+     * constraint therefore that needs to get checked in the Service layer
+     */
+    @PrePersist
+    @PreUpdate
+    private void validateAdminPresence() {
+        long adminCount = groupMembershipList.stream()
+                .filter(m -> m.getMembershipRole() == MembershipRole.ADMIN)
+                .count();
+
+        if (adminCount != 1) {
+            throw new IllegalStateException(
+                    "Group must have exactly one admin, but found " + adminCount + "."
+            );
+        }
     }
 }

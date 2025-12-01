@@ -12,6 +12,7 @@ import com.example.demo.repository.GroupMembershipRepository;
 import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.security.UserSecurity;
 import com.example.demo.service.utils.Generator;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,13 +26,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @WithMockUser
 @Import({GroupServiceTest.MethodSec.class, UserSecurity.class})
 public class GroupServiceTest extends SystemTest {
-    private static final String EVENT_OWNER_USERNAME = "test";
     private final Generator generator;
     private final CalendarUserRepository calendarUserRepository;
+    private final EntityManager entityManager;
     private UserGroup userGroup;
     private CalendarUser calendarUser;
     @Autowired
@@ -42,9 +44,10 @@ public class GroupServiceTest extends SystemTest {
     private GroupMembershipRepository groupMembershipRepository;
 
     @Autowired
-    public GroupServiceTest(Generator generator, CalendarUserRepository calendarUserRepository) {
+    public GroupServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EntityManager entityManager) {
         this.generator = generator;
         this.calendarUserRepository = calendarUserRepository;
+        this.entityManager = entityManager;
     }
 
     @BeforeEach
@@ -174,7 +177,8 @@ public class GroupServiceTest extends SystemTest {
         CalendarUser testUser = generator.createUser();
         UserGroup testGroup = generator.createUserGroup("Group", testUser, List.of(calendarUser));
         groupService.leaveGroup(calendarUser.getUsername(), testGroup.getId());
-        Assertions.assertEquals(1, userGroupRepository.findById(testGroup.getId()).orElseThrow().getGroupMembershipList().size());
+        long membershipCount = groupMembershipRepository.countByGroup_Id(testGroup.getId());
+        Assertions.assertEquals(1, membershipCount);
     }
 
     @Test
@@ -191,7 +195,8 @@ public class GroupServiceTest extends SystemTest {
         CalendarUser testUser = generator.createUser();
         UserGroup testGroup = generator.createUserGroup("Group", calendarUser, List.of(testUser));
         groupService.leaveGroup(calendarUser.getUsername(), testGroup.getId());
-        Assertions.assertEquals(1, testGroup.getGroupMembershipList().size());
+        long membershipCount = groupMembershipRepository.countByGroup_Id(testGroup.getId());
+        Assertions.assertEquals(1, membershipCount);
         Assertions.assertEquals(MembershipRole.ADMIN, groupMembershipRepository.findGroupMembershipByGroupAndUser(testGroup, testUser).orElseThrow().getMembershipRole());
     }
 
@@ -289,6 +294,20 @@ public class GroupServiceTest extends SystemTest {
         );
         UserGroupDTO userGroupDTO = groupService.createNewGroup(createGroupDTO, EVENT_OWNER_USERNAME);
         Assertions.assertTrue(userGroupRepository.existsById(userGroupDTO.getId()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getUserGroupThrowsNoSuchElementWhenGroupDoesNotExist() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> groupService.getUserGroup(UUID.randomUUID()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getUserGroupReturnsUserGroupDTOForExistingGroup() {
+        UserGroup userGroup = generator.createUserGroup("testGroup", calendarUser);
+        UserGroupDTO userGroupDTO = groupService.getUserGroup(userGroup.getId());
+        Assertions.assertEquals(userGroup.getId(), userGroupDTO.getId());
     }
 
     @TestConfiguration

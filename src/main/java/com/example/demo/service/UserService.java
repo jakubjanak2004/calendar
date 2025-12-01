@@ -33,7 +33,6 @@ public class UserService {
         return calendarUserRepository.findAll(pageable).map(calendarUserMapper::toDTO);
     }
 
-    // todo add tests
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
     public boolean hasAnyInvitations(String username) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();

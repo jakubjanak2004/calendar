@@ -27,7 +27,6 @@ import java.util.UUID;
 @Transactional
 @Validated
 @RequiredArgsConstructor
-// todo add tests
 public class GroupMembershipService {
     private final GroupMembershipRepository groupMembershipRepository;
     private final CalendarUserRepository calendarUserRepository;
@@ -76,6 +75,25 @@ public class GroupMembershipService {
         UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
         CalendarUser calendarUser = calendarUserRepository.findById(userId).orElseThrow();
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
+
+        // old and new value to check for admin presence
+        MembershipRole oldRole = groupMembership.getMembershipRole();
+        MembershipRole newRole = changeMembershipRoleDTO.getNewMembershipRole();
+
+        if (oldRole == MembershipRole.ADMIN) {
+            throw new IllegalStateException("Cannot change admins Membership role, you need to pick a new ADMIN if you want to give up admin role!");
+        }
+
+        if (newRole == MembershipRole.ADMIN) {
+            // set the old admin to MEMBER
+            groupMembershipRepository.findAllByGroupAndMembershipRole(userGroup, MembershipRole.ADMIN).forEach(oldAdminGroupMembership -> {
+                oldAdminGroupMembership.setMembershipRole(MembershipRole.MEMBER);
+                groupMembershipRepository.save(oldAdminGroupMembership);
+            });
+        }
+
+        // changing and saving the membership role
         groupMembership.setMembershipRole(changeMembershipRoleDTO.getNewMembershipRole());
+        groupMembershipRepository.save(groupMembership);
     }
 }
