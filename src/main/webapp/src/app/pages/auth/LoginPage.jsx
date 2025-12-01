@@ -22,7 +22,8 @@ export function LoginPage() {
             const userId = res.data.userId
             const firstName = res.data.firstName
             const lastName = res.data.lastName
-            login(token, userId, username, firstName, lastName)
+            const color = res.data.color
+            login(token, userId, username, firstName, lastName, color.color)
             navigate("/", {replace: true})
         } catch (error) {
             if (error.response.status === 401) {

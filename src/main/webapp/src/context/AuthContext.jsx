@@ -9,10 +9,12 @@ export function AuthProvider({children}) {
     const [username, setUsername] = useState("")
     const [firstName, setFirstName] = useState("")
     const [lastName, setLastName] = useState("")
+    const [color, setColor] = useState("")
 
     useEffect(() => {
         http.setToken(token)
     }, [token])
+
 
     const value = useMemo(() => ({
         loggedIn: !!token,
@@ -21,17 +23,31 @@ export function AuthProvider({children}) {
         username,
         firstName,
         lastName,
-        login: (t, userId, username, firstName, lastName) => {
+        color,
+        login: (t, userId, username, firstName, lastName, color) => {
             setToken(t)
             setUserId(userId)
             setUsername(username)
             setFirstName(firstName)
             setLastName(lastName)
+            setColor(color)
         },
         logout: () => {
             setToken(null)
         },
-    }), [token, username, firstName, lastName]);
+        updateUser: async (newFirstName, newLastName, newColor) => {
+            await http.client.put('users/me', {
+                firstName: newFirstName,
+                lastName: newLastName,
+                color: {
+                    color: newColor
+                }
+            });
+            setFirstName(newFirstName);
+            setLastName(newLastName);
+            setColor(newColor);
+        }
+    }), [token, username, firstName, lastName, color]);
 
     return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

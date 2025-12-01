@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {http} from "../../../lib/http.jsx";
-import UserGroup from "../../../components/groups/UserGroup.jsx";
+import UserGroupMembership from "../../../components/groups/UserGroupMembership.jsx";
 import DashboardButton from "../../../components/buttons/DashboardButton.jsx";
 import AddGroupButton from "../../../components/buttons/AddGroupButton.jsx";
 
@@ -14,8 +14,8 @@ export default function GroupsPage() {
     async function getUserGroups(p = page, s = size) {
         setLoading(true);
         try {
-            const res = await http.client.get("/groups", {
-                params: {page: p, size: s, sort: "name,asc"},
+            const res = await http.client.get("/groupMemberships/me", {
+                params: {page: p, size: s, sort: "groupName,asc"},
             });
             const data = res.data;
             setContent(data.content ?? []);
@@ -66,9 +66,9 @@ export default function GroupsPage() {
 
             {loading && <p>Loading…</p>}
             <ul>
-                {content.map((group, i) => (
+                {content.map((groupMembership, i) => (
                     <li key={i}>
-                        <UserGroup key={group.id} group={group}/>
+                        <UserGroupMembership key={groupMembership.id} groupMembership={groupMembership}/>
                     </li>
                 ))}
                 {!loading && content.length === 0 && <li>No groups yet.</li>}

@@ -1,13 +1,14 @@
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {http} from "../../../lib/http.jsx";
 import CalendarUser from "../../../components/users/CalendarUser.jsx";
 import {useAuth} from "../../../context/AuthContext.jsx";
 
-// todo add membership role administration, that an admin can change usersMembershipRoles
 export default function ManageMembersPage() {
     const {groupId} = useParams();
     const {userId: currentUserId} = useAuth();
+    const location = useLocation();
+    const [canManageMembership, setCanManageMembership] = useState(location.state?.canManageMembership);
 
     // --- Members & Invited (from backend) ---
     const [members, setMembers] = useState([]);
@@ -19,7 +20,15 @@ export default function ManageMembersPage() {
     const memberIdSet = useMemo(() => new Set(members.map(u => u.id)), [members]);
     const invitedIdSet = useMemo(() => new Set(invited.map(u => u.id)), [invited]);
 
-    const otherMembers = useMemo(() => members.filter(m => m.id !== currentUserId), [members, currentUserId]);
+    // const otherMembers = useMemo(() => members.filter(m => m.id !== currentUserId), [members, currentUserId]);
+    const [otherMembers, setOtherMembers] = useState(() =>
+        members.filter(m => m.id !== currentUserId)
+    );
+
+    useEffect(() => {
+        // keep otherMembers in sync if members/currentUserId change
+        setOtherMembers(members.filter(m => m.id !== currentUserId));
+    }, [members, currentUserId]);
 
     // Loaders
     const getMembers = useCallback(async () => {
@@ -35,7 +44,6 @@ export default function ManageMembersPage() {
     const getInvited = useCallback(async () => {
         setLoadingInvited(true);
         try {
-            // new endpoint you mentioned:
             const res = await http.client.get(`groups/${groupId}/users/invited`);
             setInvited(res.data ?? []);
         } finally {
@@ -112,6 +120,31 @@ export default function ManageMembersPage() {
         }
     }, [groupId, users]);
 
+    async function userRoleChanged(e, user) {
+        const oldMembershipRole = user.membershipRole;
+        const newMembershipRole = e.target.value;
+        // haven't changed the role
+        if (newMembershipRole === oldMembershipRole) return;
+        if (newMembershipRole === "ADMIN") {
+            const ok = confirm("Do you really want to give up ADMIN membership role? You wont be able to edit members anymore!")
+            if (!ok) return;
+            // gave up ADMIN membership role
+            setCanManageMembership(false)
+        }
+        try {
+            await http.client.put(`/groupMemberships/${groupId}/users/${user.id}`, {
+                newMembershipRole
+            })
+            setOtherMembers(prev =>
+                prev.map(m =>
+                    m.id === user.id ? { ...m, membershipRole: newMembershipRole } : m
+                )
+            );
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     // Initial loads
     useEffect(() => {
         getMembers().catch(console.error);
@@ -132,12 +165,31 @@ export default function ManageMembersPage() {
                 <li className="text-sm text-gray-500">No other members.</li>)}
             {otherMembers.map(member => (<li key={member.id} className="flex items-center gap-3">
                 <CalendarUser user={member}>
-                    <button
-                        onClick={() => removeMember(member)}
-                        className="remove-button"
-                    >
-                        Remove
-                    </button>
+                    {canManageMembership ? (
+                        <>
+                            <select
+                                value={member.membershipRole}
+                                onChange={e => userRoleChanged(e, member)}
+                            >
+                                <option value="ADMIN">ADMIN</option>
+                                <option value="EDITOR">EDITOR</option>
+                                <option value="MEMBER">MEMBER</option>
+                            </select>
+                            <button
+                                onClick={() => removeMember(member)}
+                                className="remove-button"
+                            >
+                                Remove
+                            </button>
+                        </>
+                    ) : (
+                        <p
+                            className={"membership-role"}
+                            data-role={member.membershipRole}
+                        >
+                            {member.membershipRole}
+                        </p>
+                    )}
                 </ CalendarUser>
             </li>))}
         </ul>
@@ -148,47 +200,58 @@ export default function ManageMembersPage() {
             {!loadingInvited && invited.length === 0 && (<li>No pending invites.</li>)}
             {invited.map(u => (<li key={u.id}>
                 <CalendarUser user={u}>
-                    <button
-                        onClick={() => cancelInvitation(u)}
-                        className="remove-button"
-                    >
-                        Cancel Invitation
-                    </button>
+                    {canManageMembership &&
+                        <button
+                            onClick={() => cancelInvitation(u)}
+                            className="remove-button"
+                        >
+                            Cancel Invitation
+                        </button>
+                    }
                 </CalendarUser>
             </li>))}
         </ul>
 
-        <h2>Invite users</h2>
-        <div>
-            <button
-                onClick={() => fetchUsers(Math.max(0, page - 1))}
-                disabled={loadingUsers || page === 0}
-            >
-                Previous
-            </button>
-            <span>Page {page + 1}</span>
-            <button
-                onClick={() => fetchUsers(page + 1)}
-                disabled={loadingUsers || last}
-            >
-                Next
-            </button>
-        </div>
-        <div>
-            <ul>
-                {inviteCandidates.map(u => (<li key={u.id}>
-                    <CalendarUser user={u}>
-                        <button
-                            className={"invite-button"}
-                            onClick={() => inviteUser(u.id)}
-                            disabled={inviting === u.id}
-                        >
-                            {inviting === u.id ? "Inviting…" : "Invite"}
-                        </button>
-                    </CalendarUser>
-                </li>))}
-                {!loadingUsers && inviteCandidates.length === 0 && (<li>No users to invite on this page.</li>)}
-            </ul>
-        </div>
+        {canManageMembership && (
+            <>
+                <h2>Invite users</h2>
+                <div>
+                    <button
+                        onClick={() => fetchUsers(Math.max(0, page - 1))}
+                        disabled={loadingUsers || page === 0}
+                    >
+                        Previous
+                    </button>
+                    <span>Page {page + 1}</span>
+                    <button
+                        onClick={() => fetchUsers(page + 1)}
+                        disabled={loadingUsers || last}
+                    >
+                        Next
+                    </button>
+                </div>
+                <div>
+                    <ul>
+                        {inviteCandidates.map(u => (
+                            <li key={u.id}>
+                                <CalendarUser user={u}>
+                                    <button
+                                        className={"invite-button"}
+                                        onClick={() => inviteUser(u.id)}
+                                        disabled={inviting === u.id}
+                                    >
+                                        {inviting === u.id ? "Inviting…" : "Invite"}
+                                    </button>
+                                </CalendarUser>
+                            </li>
+                        ))}
+                        {!loadingUsers && inviteCandidates.length === 0 && (
+                            <li>No users to invite on this page.</li>
+                        )}
+                    </ul>
+                </div>
+            </>
+        )}
+
     </>
 }

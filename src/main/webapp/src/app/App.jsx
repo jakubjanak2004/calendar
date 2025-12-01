@@ -13,6 +13,7 @@ import AddGroupPage from "./pages/groups/AddGroupPage.jsx";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import UpdateEventPage from "./pages/events/UpdateEventPage.jsx";
 import CalendarUserDetail from "../components/users/CalendarUserDetail.jsx";
+import SettingsPage from "./pages/dashboard/SettingsPage.jsx";
 
 function App() {
     return <Routes>
@@ -27,7 +28,7 @@ function App() {
                 <Route path="eventOwner/:eventOwnerId/addEvent" element={<AddEventPage/>}/>
             </Route>
             <Route path="invitations" element={<Invitations/>}></Route>
-            <Route path="/:eventOwnerId/addEvent" element={<AddEventPage/>}/>
+            <Route path="settings" element={<SettingsPage />}></Route>
             <Route path="groups" element={<GroupsPage/>}/>
             <Route path={"/groups/addGroup"} element={<AddGroupPage/>}/>
             <Route path="groups/:groupId" element={<UserGroupDetail/>}>

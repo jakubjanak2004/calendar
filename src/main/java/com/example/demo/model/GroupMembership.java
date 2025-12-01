@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,6 +43,9 @@ public class GroupMembership {
     @ManyToOne(optional = false)
     @JoinColumn
     private UserGroup group;
+
+    @Column(nullable = false)
+    private Color color = new Color("#bada55");
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

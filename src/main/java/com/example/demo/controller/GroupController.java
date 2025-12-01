@@ -29,7 +29,7 @@ public class GroupController {
     private final GroupService groupService;
 
     @GetMapping
-    public ResponseEntity<Page<UserGroupDTO>> getGroupsForUser(Pageable pageable, Principal principal) {
+    public ResponseEntity<Page<UserGroupDTO>> getAllGroupsForUserPageable(Pageable pageable, Principal principal) {
         return ResponseEntity.ok(groupService.getAllGroupsForUserPageable(principal.getName(), pageable));
     }
 

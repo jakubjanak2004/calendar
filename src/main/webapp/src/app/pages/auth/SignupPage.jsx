@@ -82,7 +82,8 @@ export function SignupPage() {
         const username = res.data.username;
         const firstName = res.data.firstName;
         const lastName = res.data.lastName
-        login(token, userId, username, firstName, lastName)
+        const color = res.data.color
+        login(token, userId, username, firstName, lastName, color.color)
         reset();
         navigate("/", { replace: true });
     }

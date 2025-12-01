@@ -7,6 +7,7 @@ import GroupsButton from "../buttons/GroupsButton.jsx";
 export default function UserGroupDetail() {
     const {groupId} = useParams();
     const [group, setGroup] = useState({})
+    const [groupMemberships, setGroupMemberships] = useState([])
     const [groupMembers, setGroupMembers] = useState([])
     const [userRole, setUserRole] = useState("")
     const navigate = useNavigate()
@@ -24,9 +25,13 @@ export default function UserGroupDetail() {
         setUserRole(res.data)
     }
 
-    async function fetchGroupInfo() {
+    async function fetchGroupAndMembership() {
         const res = await http.client.get(`groups/${groupId}`)
+        const membershipInfo = await http.client.get(`groupMemberships/${groupId}/me`)
+        const membership = membershipInfo.data
         setGroup(res.data)
+        membership.canManage = membership.membershipRole === "ADMIN" || membership.membershipRole === "EDITOR";
+        setGroupMemberships([membership])
     }
 
     async function leaveGroup() {
@@ -42,28 +47,19 @@ export default function UserGroupDetail() {
     }, [groupId]);
 
     useEffect(() => {
-       fetchGroupInfo().finally()
+        fetchGroupAndMembership().finally()
     }, [groupId]);
 
     return <>
-        <header className={"sticky"}>
+        <header>
             <nav>
                 <GroupsButton/>
                 <button className={"button"} onClick={leaveGroup}>Leave Group</button>
-                {canManageMembership && (
-                    <Link className={"button"} to={'manageMembers'}>Manage Members</Link>
-                )}
+                <Link className={"button"} to={'manageMembers'} state={{canManageMembership}}>Group Members</Link>
             </nav>
             <h1>{group.name}</h1>
         </header>
-        {/*<ul>*/}
-        {/*    {groupMembers.map((member, i) => (*/}
-        {/*        <li key={i}>*/}
-        {/*            <CalendarUser user={member}/>*/}
-        {/*        </li>*/}
-        {/*    ))}*/}
-        {/*</ul>*/}
-        <AppCalendar eventOwnerId={groupId} canManageEvents={canAddEvents}/>
+        <AppCalendar memberships={groupMemberships} canAddEvents={canAddEvents}/>
         <Outlet/>
     </>
 }

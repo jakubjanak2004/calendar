@@ -40,7 +40,14 @@ public class AuthService {
 
         CalendarUser user = (CalendarUser) auth.getPrincipal();
         String token = generateToken(user);
-        return new AuthResponseDTO(user.getId(), token, user.getUsername(), user.getFirstName(), user.getLastName());
+        return new AuthResponseDTO(
+                user.getId(),
+                token,
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getColor()
+        );
     }
 
     public AuthResponseDTO signup(SignUpDTO signupDTO) {
@@ -51,7 +58,14 @@ public class AuthService {
         CalendarUser calendarUser = signUpMapper.toEntity(signupDTO);
         calendarUserRepository.save(calendarUser);
         String token = generateToken(calendarUser);
-        return new AuthResponseDTO(calendarUser.getId(), token, calendarUser.getUsername(), calendarUser.getFirstName(), calendarUser.getLastName());
+        return new AuthResponseDTO(
+                calendarUser.getId(),
+                token,
+                calendarUser.getUsername(),
+                calendarUser.getFirstName(),
+                calendarUser.getLastName(),
+                calendarUser.getColor()
+        );
     }
 
     private String generateToken(UserDetails userDetails) {
