@@ -11,35 +11,24 @@ import com.example.demo.model.UserGroup;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
 import com.example.demo.repository.UserGroupRepository;
-import com.example.demo.security.EventSecurity;
 import com.example.demo.service.utils.Generator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@WithMockUser
-@Import({EventServiceTest.MethodSec.class, EventSecurity.class})
 public class GroupMembershipTest extends SystemTest {
-    private final CalendarUserRepository calendarUserRepository;
-    private final Generator generator;
     private final GroupMembershipService groupMembershipService;
-    private final UserGroupRepository userGroupRepository;
     private final GroupMembershipRepository groupMembershipRepository;
 
-    private CalendarUser calendarUser;
-    private UserGroup userGroup;
 
     @Autowired
     public GroupMembershipTest(CalendarUserRepository calendarUserRepository,
@@ -47,22 +36,9 @@ public class GroupMembershipTest extends SystemTest {
                                GroupMembershipService groupMembershipService,
                                UserGroupRepository userGroupRepository,
                                GroupMembershipRepository groupMembershipRepository) {
-        this.calendarUserRepository = calendarUserRepository;
-        this.generator = generator;
+        super(calendarUserRepository, userGroupRepository, generator);
         this.groupMembershipService = groupMembershipService;
-        this.userGroupRepository = userGroupRepository;
         this.groupMembershipRepository = groupMembershipRepository;
-    }
-
-
-    @BeforeEach
-    void initData() {
-        if (calendarUser != null) {
-            calendarUserRepository.delete(calendarUser);
-            userGroupRepository.delete(userGroup);
-        }
-        calendarUser = calendarUserRepository.save(generator.createUser(EVENT_OWNER_USERNAME, "testPassword"));
-        userGroup = userGroupRepository.save(UserGroup.initGroupWithAdminUsers(List.of(calendarUser), "testUserGroup"));
     }
 
     @Test
@@ -265,11 +241,5 @@ public class GroupMembershipTest extends SystemTest {
 
         Assertions.assertEquals(MembershipRole.MEMBER, calendarUserMembership.getMembershipRole());
         Assertions.assertEquals(MembershipRole.ADMIN, testUserMembership.getMembershipRole());
-    }
-
-
-    @TestConfiguration
-    @EnableMethodSecurity
-    static class MethodSec {
     }
 }

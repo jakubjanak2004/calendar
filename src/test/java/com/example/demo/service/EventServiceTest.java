@@ -30,32 +30,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@WithMockUser
-@Import({EventServiceTest.MethodSec.class, EventSecurity.class})
 public class EventServiceTest extends SystemTest {
-    private final Generator generator;
     private final EventRepository eventRepository;
     private final EventService eventService;
-    private CalendarUser calendarUser;
-    @Autowired
-    private CalendarUserRepository calendarUserRepository;
-    @Autowired
-    private UserGroupRepository userGroupRepository;
 
     @Autowired
-    public EventServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
-        this.generator = generator;
-        this.calendarUserRepository = calendarUserRepository;
+    public EventServiceTest(Generator generator, UserGroupRepository userGroupRepository,  CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
+        super(calendarUserRepository, userGroupRepository, generator);
         this.eventRepository = eventRepository;
         this.eventService = eventService;
-    }
-
-    @BeforeEach
-    void initData() {
-        if (calendarUser != null) {
-            calendarUserRepository.delete(calendarUser);
-        }
-        calendarUser = calendarUserRepository.save(generator.createUser(EVENT_OWNER_USERNAME, "testPassword"));
     }
 
     @Test
@@ -230,10 +213,5 @@ public class EventServiceTest extends SystemTest {
         Event event = generator.createEvent(calendarUser, 5, 60);
         EventDTO eventDTO = eventService.getEvent(event.getId());
         Assertions.assertEquals(event.getId(), eventDTO.getId());
-    }
-
-    @TestConfiguration
-    @EnableMethodSecurity
-    static class MethodSec {
     }
 }

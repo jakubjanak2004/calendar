@@ -31,33 +31,14 @@ import java.util.UUID;
 @WithMockUser
 @Import({GroupServiceTest.MethodSec.class, UserSecurity.class})
 public class GroupServiceTest extends SystemTest {
-    private final Generator generator;
-    private final CalendarUserRepository calendarUserRepository;
-    private final EntityManager entityManager;
-    private UserGroup userGroup;
-    private CalendarUser calendarUser;
-    @Autowired
-    private UserGroupRepository userGroupRepository;
-    @Autowired
-    private GroupService groupService;
-    @Autowired
-    private GroupMembershipRepository groupMembershipRepository;
+    private final GroupService groupService;
+    private final GroupMembershipRepository groupMembershipRepository;
 
     @Autowired
-    public GroupServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EntityManager entityManager) {
-        this.generator = generator;
-        this.calendarUserRepository = calendarUserRepository;
-        this.entityManager = entityManager;
-    }
-
-    @BeforeEach
-    void initData() {
-        if (calendarUser != null) {
-            calendarUserRepository.delete(calendarUser);
-            userGroupRepository.delete(userGroup);
-        }
-        calendarUser = calendarUserRepository.save(generator.createUser(EVENT_OWNER_USERNAME, "testPassword"));
-        userGroup = userGroupRepository.save(UserGroup.initGroupWithAdminUsers(List.of(calendarUser), "testUserGroup"));
+    public GroupServiceTest(CalendarUserRepository calendarUserRepository, UserGroupRepository userGroupRepository, Generator generator, GroupService groupService, GroupMembershipRepository groupMembershipRepository) {
+        super(calendarUserRepository, userGroupRepository, generator);
+        this.groupService = groupService;
+        this.groupMembershipRepository = groupMembershipRepository;
     }
 
     @Test

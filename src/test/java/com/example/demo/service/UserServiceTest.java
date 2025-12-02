@@ -23,32 +23,14 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class UserServiceTest extends SystemTest {
-    private static final String EVENT_OWNER_USERNAME = "test";
-    private final Generator generator;
     private final CalendarUserRepository userRepository;
     private final UserService userService;
-    private final CalendarUserRepository calendarUserRepository;
-    private final UserGroupRepository userGroupRepository;
-    private CalendarUser calendarUser;
-    private UserGroup userGroup;
 
     @Autowired
     public UserServiceTest(Generator generator, CalendarUserRepository userRepository, UserService userService, CalendarUserRepository calendarUserRepository, UserGroupRepository userGroupRepository) {
-        this.generator = generator;
+        super(calendarUserRepository, userGroupRepository, generator);
         this.userRepository = userRepository;
         this.userService = userService;
-        this.calendarUserRepository = calendarUserRepository;
-        this.userGroupRepository = userGroupRepository;
-    }
-
-    @BeforeEach
-    void initData() {
-        if (calendarUser != null) {
-            calendarUserRepository.delete(calendarUser);
-            userGroupRepository.delete(userGroup);
-        }
-        calendarUser = calendarUserRepository.save(generator.createUser(EVENT_OWNER_USERNAME, "testPassword"));
-        userGroup = userGroupRepository.save(UserGroup.initGroupWithAdminUsers(List.of(calendarUser), "testUserGroup"));
     }
 
     @Test
@@ -76,7 +58,7 @@ public class UserServiceTest extends SystemTest {
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void hasAnyInvitationsReturnsTrueIfInvitationIsPresent() {
         CalendarUser testUser = generator.createUser();
-        UserGroup userGroup = generator.createUserGroup("testUserGroup", testUser);
+        UserGroup userGroup = generator.createUserGroup("testGroup", testUser);
         userGroup.inviteUser(calendarUser);
         userGroupRepository.save(userGroup);
         Assertions.assertTrue(userService.hasAnyInvitations(calendarUser.getUsername()));
@@ -86,7 +68,7 @@ public class UserServiceTest extends SystemTest {
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void hasAnyInvitationsReturnsFalseIfInvitationIsNotPresent() {
         CalendarUser testUser = generator.createUser();
-        UserGroup userGroup = generator.createUserGroup("testUserGroup", testUser);
+        UserGroup userGroup = generator.createUserGroup("testGroup", testUser);
         userGroupRepository.save(userGroup);
         Assertions.assertFalse(userService.hasAnyInvitations(calendarUser.getUsername()));
     }

@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.SystemTest;
 import com.example.demo.config.JwtProps;
 import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
@@ -7,6 +8,7 @@ import com.example.demo.dto.response.AuthResponseDTO;
 import com.example.demo.exception.UsernameAlreadyExistsException;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.CalendarUserRepository;
+import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.service.utils.Generator;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,27 +22,24 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class AuthServiceTest {
-    private final String password = "password";
+public class AuthServiceTest extends SystemTest {
     private final JwtDecoder jwtDecoder;
-    private final Generator generator;
     private final AuthService authService;
-    private final CalendarUserRepository calendarUserRepository;
     private final JwtProps jwtProps;
-    private CalendarUser calendarUser;
 
-    @BeforeEach
-    void setUp() {
-        calendarUser = calendarUserRepository.save(generator.createUser(password));
+    @Autowired
+    public AuthServiceTest(CalendarUserRepository calendarUserRepository, UserGroupRepository userGroupRepository, Generator generator, JwtDecoder jwtDecoder, AuthService authService, JwtProps jwtProps) {
+        super(calendarUserRepository, userGroupRepository, generator);
+        this.jwtDecoder = jwtDecoder;
+        this.authService = authService;
+        this.jwtProps = jwtProps;
     }
 
     @Test
     public void loginReturnsValidTokenForExistingUser() {
         AuthResponseDTO token = authService.login(new LoginDTO(
                 calendarUser.getUsername(),
-                password
+                EVENT_OWNER_PASSWORD
         ));
         isValidToken(token, calendarUser.getUsername());
     }
