@@ -30,33 +30,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@WithMockUser
-@Import({EventServiceTest.MethodSec.class, EventSecurity.class})
 public class EventServiceTest extends SystemTest {
-    private static final String EVENT_OWNER_USERNAME = "test";
-    private final Generator generator;
     private final EventRepository eventRepository;
     private final EventService eventService;
-    private CalendarUser calendarUser;
-    @Autowired
-    private CalendarUserRepository calendarUserRepository;
-    @Autowired
-    private UserGroupRepository userGroupRepository;
 
     @Autowired
-    public EventServiceTest(Generator generator, CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
-        this.generator = generator;
-        this.calendarUserRepository = calendarUserRepository;
+    public EventServiceTest(Generator generator, UserGroupRepository userGroupRepository,  CalendarUserRepository calendarUserRepository, EventRepository eventRepository, EventService eventService) {
+        super(calendarUserRepository, userGroupRepository, generator);
         this.eventRepository = eventRepository;
         this.eventService = eventService;
-    }
-
-    @BeforeEach
-    void initData() {
-        if (calendarUser != null) {
-            calendarUserRepository.delete(calendarUser);
-        }
-        calendarUser = calendarUserRepository.save(generator.createUser(EVENT_OWNER_USERNAME, "testPassword"));
     }
 
     @Test
@@ -163,7 +145,7 @@ public class EventServiceTest extends SystemTest {
 
     @Test
     @WithMockUser(username = EVENT_OWNER_USERNAME)
-    public void deleteEventThrowsExceptionWhenUserIsNotOwnerOfThatEvent() {
+    public void deleteEventThrowsAuthorizationDeniedExceptionWhenUserIsNotOwnerOfThatEvent() {
         CalendarUser calendarUser = calendarUserRepository.save(generator.createUser());
         Event event = eventRepository.save(
                 generator.createEvent(
@@ -211,8 +193,25 @@ public class EventServiceTest extends SystemTest {
         Assertions.assertEquals(3, eventService.getAllEventsInRangeForEventOwner(calendarUser.getId(), startTime, endTime).size());
     }
 
-    @TestConfiguration
-    @EnableMethodSecurity
-    static class MethodSec {
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventThrowsAuthorizationDeniedExceptionWhenUserIsNotOwnerOfThatEvent() {
+        CalendarUser testUser = calendarUserRepository.save(generator.createUser());
+        Event event = generator.createEvent(testUser, 5, 60);
+        Assertions.assertThrows(AuthorizationDeniedException.class, () -> eventService.getEvent(event.getId()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventThrowsNoSuchElementExceptionWhenEventDoesNotExist() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> eventService.getEvent(UUID.randomUUID()));
+    }
+
+    @Test
+    @WithMockUser(username = EVENT_OWNER_USERNAME)
+    public void getEventReturnsEventForUserThatIsOwnerOfThatEvent() {
+        Event event = generator.createEvent(calendarUser, 5, 60);
+        EventDTO eventDTO = eventService.getEvent(event.getId());
+        Assertions.assertEquals(event.getId(), eventDTO.getId());
     }
 }

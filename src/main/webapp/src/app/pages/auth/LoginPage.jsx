@@ -1,7 +1,7 @@
 import {Link, useNavigate} from "react-router-dom";
 import {http} from "../../../lib/http.jsx";
 import {useState} from "react";
-import {useAuth} from "../../../features/AuthContext.jsx";
+import {useAuth} from "../../../context/AuthContext.jsx";
 
 export function LoginPage() {
     const {login} = useAuth()
@@ -22,7 +22,8 @@ export function LoginPage() {
             const userId = res.data.userId
             const firstName = res.data.firstName
             const lastName = res.data.lastName
-            login(token, userId, username, firstName, lastName)
+            const color = res.data.color
+            login(token, userId, username, firstName, lastName, color.color)
             navigate("/", {replace: true})
         } catch (error) {
             if (error.response.status === 401) {
@@ -44,6 +45,7 @@ export function LoginPage() {
                 onChange={e => setUsername(e.target.value)}
                 autoComplete="username"
                 required
+                autoFocus
             />
             <input
                 type="password"

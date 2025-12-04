@@ -1,5 +1,6 @@
 package com.example.demo.dto.response;
 
+import com.example.demo.model.Color;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,4 +14,5 @@ public class AuthResponseDTO {
     private String username;
     private String firstName;
     private String lastName;
+    private Color color;
 }

@@ -1,0 +1,29 @@
+.edit-event-window {
+    position: relative;
+    z-index: 100;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    h1 {
+        pointer-events: none;
+    }
+}
+
+.window-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: none;
+        border: none;
+    }
+}

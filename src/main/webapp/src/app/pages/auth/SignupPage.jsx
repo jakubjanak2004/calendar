@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { http } from "../../../lib/http.jsx";
-import { useAuth } from "../../../features/AuthContext.jsx";
+import { useAuth } from "../../../context/AuthContext.jsx";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -82,7 +82,8 @@ export function SignupPage() {
         const username = res.data.username;
         const firstName = res.data.firstName;
         const lastName = res.data.lastName
-        login(token, userId, username, firstName, lastName)
+        const color = res.data.color
+        login(token, userId, username, firstName, lastName, color.color)
         reset();
         navigate("/", { replace: true });
     }
@@ -93,7 +94,7 @@ export function SignupPage() {
             <h1 className="main-header">Signup page</h1>
 
             <form onSubmit={handleSubmit(onSubmit)} className="auth-form" noValidate>
-                <input type="text" placeholder="first name" {...register("firstName")} />
+                <input type="text" placeholder="first name" {...register("firstName")} autoFocus/>
                 {errors.firstName && <p role="alert">{errors.firstName.message}</p>}
 
                 <input type="text" placeholder="last name" {...register("lastName")} />

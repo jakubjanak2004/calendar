@@ -19,7 +19,11 @@ export default function InvitationsButton() {
     }, []);
 
     return <>
-        <Link className={"button"} to={"/invitations"}>
+        <Link
+            className={"button"}
+            to={"/invitations"}
+            title="See your Invitations"
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"

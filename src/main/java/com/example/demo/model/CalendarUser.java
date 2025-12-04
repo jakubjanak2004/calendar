@@ -34,12 +34,20 @@ public class CalendarUser extends EventOwner implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private Color color = new Color("#0650bc");
+
 
     public CalendarUser(String firstName, String lastName, String username, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+    }
+
+    public void removeMembership(GroupMembership membership) {
+        groupMembershipList.remove(membership);
+        membership.setUser(null);
     }
 
     @Override

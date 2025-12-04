@@ -54,7 +54,6 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
-    // todo add tests
     @PreAuthorize("@eventSecurity.isOwner(#eventId, authentication)")
     public EventDTO getEvent(UUID eventId) {
         return eventRepository.findById(eventId)

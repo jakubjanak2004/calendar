@@ -10,6 +10,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,6 @@ public class EventOwner {
     @GeneratedValue
     private UUID id;
 
-    @OneToMany(mappedBy = "eventOwner", cascade = CascadeType.PERSIST)
-    private List<Event> events;
+    @OneToMany(mappedBy = "eventOwner", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Event> events = new ArrayList<>();
 }

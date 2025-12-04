@@ -1,16 +1,15 @@
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, Outlet, useNavigate, useParams} from "react-router-dom";
 import AppCalendar from "../calendar/AppCalendar.jsx";
 import {useEffect, useState} from "react";
 import {http} from "../../lib/http.jsx";
-import CalendarUser from "../users/CalendarUser.jsx";
 import GroupsButton from "../buttons/GroupsButton.jsx";
 
 export default function UserGroupDetail() {
     const {groupId} = useParams();
+    const [group, setGroup] = useState({})
+    const [groupMemberships, setGroupMemberships] = useState([])
     const [groupMembers, setGroupMembers] = useState([])
     const [userRole, setUserRole] = useState("")
-    const location = useLocation();
-    const groupName = location.state?.groupName;
     const navigate = useNavigate()
 
     const canAddEvents = userRole === "EDITOR" || userRole === "ADMIN";
@@ -26,8 +25,17 @@ export default function UserGroupDetail() {
         setUserRole(res.data)
     }
 
+    async function fetchGroupAndMembership() {
+        const res = await http.client.get(`groups/${groupId}`)
+        const membershipInfo = await http.client.get(`groupMemberships/${groupId}/me`)
+        const membership = membershipInfo.data
+        setGroup(res.data)
+        membership.canManage = membership.membershipRole === "ADMIN" || membership.membershipRole === "EDITOR";
+        setGroupMemberships([membership])
+    }
+
     async function leaveGroup() {
-        const ok = confirm(`Do you really want to leave ${groupName}?`)
+        const ok = confirm(`Do you really want to leave ${group.name}?`)
         if (!ok) return
         await http.client.delete(`groups/${groupId}/users/me`)
         navigate('/groups', {replace: true})
@@ -38,24 +46,20 @@ export default function UserGroupDetail() {
         getUserRole().finally()
     }, [groupId]);
 
+    useEffect(() => {
+        fetchGroupAndMembership().finally()
+    }, [groupId]);
+
     return <>
-        <header className={"sticky"}>
+        <header>
             <nav>
                 <GroupsButton/>
                 <button className={"button"} onClick={leaveGroup}>Leave Group</button>
-                {canManageMembership && (
-                    <Link className={"button"} to={'manageMembers'}>Manage Members</Link>
-                )}
+                <Link className={"button"} to={'manageMembers'} state={{canManageMembership}}>Group Members</Link>
             </nav>
-            <h1>{groupName}</h1>
+            <h1>{group.name}</h1>
         </header>
-        <ul>
-            {groupMembers.map((member, i) => (
-                <li key={i}>
-                    <CalendarUser user={member}/>
-                </li>
-            ))}
-        </ul>
-        <AppCalendar eventOwnerId={groupId} canAddEvents={canAddEvents}/>
+        <AppCalendar memberships={groupMemberships} canAddEvents={canAddEvents}/>
+        <Outlet/>
     </>
 }

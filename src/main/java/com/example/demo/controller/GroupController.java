@@ -25,11 +25,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/groups")
 @RequiredArgsConstructor
+// todo add logger to all controllers
 public class GroupController {
     private final GroupService groupService;
 
     @GetMapping
-    public ResponseEntity<Page<UserGroupDTO>> getGroupsForUser(Pageable pageable, Principal principal) {
+    public ResponseEntity<Page<UserGroupDTO>> getAllGroupsForUserPageable(Pageable pageable, Principal principal) {
         return ResponseEntity.ok(groupService.getAllGroupsForUserPageable(principal.getName(), pageable));
     }
 
@@ -41,6 +42,11 @@ public class GroupController {
     @GetMapping("/invitations")
     public ResponseEntity<List<UserGroupDTO>> getGroupInvitationsForUser(Principal principal) {
         return ResponseEntity.ok(groupService.getGroupInvitationsForUser(principal.getName()));
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<UserGroupDTO> getUserGroup(@PathVariable UUID groupId) {
+        return ResponseEntity.ok(groupService.getUserGroup(groupId));
     }
 
     @GetMapping("/{groupId}/users")

@@ -16,12 +16,14 @@ import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
 import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.security.UserSecurity;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Validated
 public class GroupService {
     private final UserGroupRepository groupRepository;
     private final UserGroupMapper userGroupMapper;
@@ -38,7 +41,6 @@ public class GroupService {
     private final CalendarUserRepository calendarUserRepository;
     private final UserGroupRepository userGroupRepository;
     private final CreateGroupMapper createGroupMapper;
-    private final UserSecurity userSecurity;
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
     public Page<UserGroupDTO> getAllGroupsForUserPageable(String username, Pageable pageable) {
@@ -94,12 +96,17 @@ public class GroupService {
 
     private void deleteUserFromGroup(CalendarUser calendarUser, UserGroup userGroup) {
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
-        groupMembershipRepository.delete(groupMembership);
-        if (groupMembership.getMembershipRole() == MembershipRole.ADMIN) {
-            List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByGroupAndUserNotAndMembershipRoleNot(userGroup, calendarUser, MembershipRole.INVITED);
+        MembershipRole membershipRole = groupMembership.getMembershipRole();
+        calendarUser.removeMembership(groupMembership);
+        userGroup.removeMembership(groupMembership);
+        if (membershipRole == MembershipRole.ADMIN) {
+            // removing ADMIN user
+            List<GroupMembership> groupMembershipList = userGroup.getGroupMembershipList();
             if (groupMembershipList.isEmpty()) {
+                // remove group if the last user being ADMIN left
                 groupRepository.delete(userGroup);
             } else {
+                // pick new ADMIN from remaining users
                 GroupMembership newAdminMembership = groupMembershipList.getFirst();
                 newAdminMembership.setMembershipRole(MembershipRole.ADMIN);
                 groupMembershipRepository.save(newAdminMembership);
@@ -134,11 +141,17 @@ public class GroupService {
     }
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
-    public UserGroupDTO createNewGroup(CreateGroupDTO createGroupDTO, String username) {
+    public UserGroupDTO createNewGroup(@Valid CreateGroupDTO createGroupDTO, String username) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
         UserGroup userGroup = createGroupMapper.toEntity(createGroupDTO);
         userGroup.addCalendarUsersToGroup(List.of(calendarUser), MembershipRole.ADMIN);
         userGroupRepository.save(userGroup);
         return userGroupMapper.toDTO(userGroup);
+    }
+
+    public UserGroupDTO getUserGroup(UUID groupId) {
+        return userGroupRepository.findById(groupId)
+                .map(userGroupMapper::toDTO)
+                .orElseThrow();
     }
 }
