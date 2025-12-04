@@ -5,6 +5,7 @@ import {http} from "../../lib/http.jsx";
 import {Link, useNavigate} from "react-router-dom";
 import EventComponent from "./EventComponent.jsx";
 import {useEvents} from "../../context/EventContext.jsx";
+import {NONE} from "react-big-calendar/lib/utils/Resources.js";
 
 function darkenHex(hex, amount) {
     // Remove "#" if present
@@ -110,6 +111,21 @@ export default function AppCalendar({memberships, canAddEvents}) {
         navigate(`event/${id}`);
     };
 
+    const handleSelectSlot = ({ start, action }) => {
+        if (!canAddEvents) return;
+        if (action !== "doubleClick") return;
+
+        // end is always one hour after start
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+        navigate(`eventOwner/${firstOwnerId}/addEvent`, {
+            state: {
+                startTime: start,
+                endTime: end,
+            }
+        });
+    };
+
     return <>
         {canAddEvents &&
             <div className={"add-events-button"}>
@@ -125,9 +141,14 @@ export default function AppCalendar({memberships, canAddEvents}) {
                 </Link>
             </div>
         }
+
         <Calendar
             localizer={localizer}
             events={events}
+            selectable={canAddEvents}
+            onSelectSlot={handleSelectSlot}
+            step={60}
+            timeslots={1}
             date={date}
             view={view}
             onNavigate={handleNavigate}

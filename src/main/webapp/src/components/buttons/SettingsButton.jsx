@@ -6,7 +6,6 @@ export default function SettingsButton() {
             to={`/settings`}
             title="Settings"
             className="button"
-            Settings
         >
             Settings
         </Link>

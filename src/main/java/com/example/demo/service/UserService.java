@@ -7,6 +7,7 @@ import com.example.demo.model.CalendarUser;
 import com.example.demo.model.MembershipRole;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +42,7 @@ public class UserService {
 
     // todo add tests, determine if mapper is needed
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
-    public CalendarUserDTO updateUser(String username, UpdateUserDTO updateUserDTO) {
+    public CalendarUserDTO updateUser(String username, @Valid UpdateUserDTO updateUserDTO) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
         updateUserMapper.updateEntity(calendarUser, updateUserDTO);
         CalendarUser updatedUser = calendarUserRepository.save(calendarUser);

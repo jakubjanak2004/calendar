@@ -2,6 +2,7 @@ import { http } from "../../../lib/http.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../../../context/AuthContext.jsx";
+import GroupsButton from "../../../components/buttons/GroupsButton.jsx";
 
 export default function AddGroupPage() {
     const [name, setName] = useState("");
@@ -73,8 +74,10 @@ export default function AddGroupPage() {
 
     return (
         <>
+            <header>
+                <GroupsButton/>
+            </header>
             <h1>Add a new Group</h1>
-
             <form onSubmit={createNewGroup}>
                 <input
                     type="text"

@@ -1,6 +1,7 @@
 import {useAuth} from "../../../context/AuthContext.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import DashboardButton from "../../../components/buttons/DashboardButton.jsx";
 
 export default function SettingsPage() {
     const {
@@ -25,6 +26,9 @@ export default function SettingsPage() {
     };
 
     return <>
+        <header>
+            <DashboardButton/>
+        </header>
         <h1>Settings Page</h1>
         <h2>{username}</h2>
 
@@ -36,6 +40,7 @@ export default function SettingsPage() {
                         type="text"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
+                        required
                     />
                 </label>
             </div>
@@ -47,6 +52,7 @@ export default function SettingsPage() {
                         type="text"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
+                        required
                     />
                 </label>
             </div>
@@ -58,6 +64,7 @@ export default function SettingsPage() {
                         type="color"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
+                        required
                     />
                 </label>
             </div>

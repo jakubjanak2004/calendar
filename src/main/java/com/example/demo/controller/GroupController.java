@@ -25,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/groups")
 @RequiredArgsConstructor
+// todo add logger to all controllers
 public class GroupController {
     private final GroupService groupService;
 

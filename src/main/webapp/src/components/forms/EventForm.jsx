@@ -14,17 +14,18 @@ function toLocalInputValue(date) {
 
 const toIso = (local) => new Date(local).toISOString();
 
-export default function EventForm({onSubmitCallback, eventId, submitButtonValue}) {
+export default function EventForm({onSubmitCallback, eventId, submitButtonValue, defaultStartTime, defaultEndTime}) {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [startTime, setStartTime] = useState(toLocalInputValue(new Date()));
-    const [endTime, setEndTime] = useState(toLocalInputValue(new Date()));
+    const [startTime, setStartTime] = useState(toLocalInputValue(defaultStartTime || new Date()));
+    const [endTime, setEndTime] = useState(toLocalInputValue(defaultEndTime || new Date()));
 
     async function onSubmitHandle(e) {
         e.preventDefault()
         onSubmitCallback(title, description, toIso(startTime), toIso(endTime))
     }
 
+    // todo determine if loading the event is necessary, it would be better to load it from local event store
     async function loadEvent() {
         const res = await http.client.get(`events/${eventId}`)
         const data = res.data
@@ -53,6 +54,7 @@ export default function EventForm({onSubmitCallback, eventId, submitButtonValue}
                 onChange={e => setTitle(e.target.value)}
                 placeholder={"Title"}
                 required
+                autoFocus
             />
             <input
                 type="text"

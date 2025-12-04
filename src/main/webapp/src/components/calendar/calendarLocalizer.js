@@ -5,11 +5,12 @@ import {
     getDay,
     format,
 } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { enUS, cs, sk } from 'date-fns/locale';
 
-// todo determine locale dynamically
 const locales = {
     'en-US': enUS,
+    'cs-CZ': cs,
+    'sk-SK': sk,
 };
 
 export const localizer = dateFnsLocalizer({
