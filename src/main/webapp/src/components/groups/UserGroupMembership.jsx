@@ -4,7 +4,7 @@ import {useState} from "react";
 import {http} from "../../lib/http.jsx";
 
 export default function UserGroupMembership({groupMembership}) {
-    const groupId = groupMembership.id
+    const groupId = groupMembership.groupId
     const groupName = groupMembership.groupName
     const navigate = useNavigate()
     const [color, setColor] = useState(groupMembership.color)

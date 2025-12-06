@@ -1,9 +1,8 @@
-import {createContext, useContext, useMemo, useState} from "react";
+import {createContext, useContext, useState} from "react";
 
 
 const EventContext = createContext(null);
 
-// todo make the functions more crud like, with crud names
 export function EventProvider({children}) {
     const [eventsByOwner, setEventsByOwner] = useState({});
 
@@ -40,7 +39,7 @@ export function EventProvider({children}) {
 
         setEventsByOwner(prev => {
             let changed = false;
-            const next = { ...prev };
+            const next = {...prev};
 
             for (const ownerId of Object.keys(prev)) {
                 const ownerEvents = prev[ownerId];
@@ -57,15 +56,16 @@ export function EventProvider({children}) {
         });
     }
 
-    function removeEvent(ownerId, eventId) {
+    function removeEventForOwner(ownerId, eventId) {
         setEventsByOwner(prev => {
-            const ownerEvents = { ...(prev[ownerId] || {}) };
+            const ownerEvents = {...(prev[ownerId] || {})};
             delete ownerEvents[eventId];
-            return { ...prev, [ownerId]: ownerEvents };
+            return {...prev, [ownerId]: ownerEvents};
         });
     }
+
     return <EventContext.Provider
-        value={{ eventsByOwner, setEventsForOwner, addEventsForOwner, updateEvent, removeEvent }}
+        value={{eventsByOwner, setEventsForOwner, addEventsForOwner, updateEvent, removeEventForOwner}}
     >
         {children}
     </EventContext.Provider>

@@ -6,10 +6,10 @@ const AuthCtx = createContext(null);
 export function AuthProvider({children}) {
     const [token, setToken] = useState(null);
     const [userId, setUserId] = useState("");
-    const [username, setUsername] = useState("")
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
-    const [color, setColor] = useState("")
+    const [username, setUsername] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [color, setColor] = useState("");
 
     useEffect(() => {
         http.setToken(token)

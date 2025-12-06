@@ -31,6 +31,7 @@ export default function UserGroupDetail() {
         const membership = membershipInfo.data
         setGroup(res.data)
         membership.canManage = membership.membershipRole === "ADMIN" || membership.membershipRole === "EDITOR";
+        membership.id = membership.groupId
         setGroupMemberships([membership])
     }
 

@@ -68,7 +68,7 @@ export default function GroupsPage() {
             <ul>
                 {content.map((groupMembership, i) => (
                     <li key={i}>
-                        <UserGroupMembership key={groupMembership.id} groupMembership={groupMembership}/>
+                        <UserGroupMembership key={groupMembership.groupId} groupMembership={groupMembership}/>
                     </li>
                 ))}
                 {!loading && content.length === 0 && <li>No groups yet.</li>}

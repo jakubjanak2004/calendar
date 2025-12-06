@@ -84,6 +84,7 @@ export default function AddGroupPage() {
                     placeholder="Group name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    required
                 />
 
                 <input type="submit" value="Create new Group"/>
@@ -101,7 +102,6 @@ export default function AddGroupPage() {
                                     checked={usersIdsList.includes(u.id)}
                                     onChange={() => toggleUser(u.id)}
                                 />
-                                {/* adjust fields based on your CalendarUserDTO */}
                                 {u.username || u.email || u.name || u.id}
                             </label>
                         </li>
