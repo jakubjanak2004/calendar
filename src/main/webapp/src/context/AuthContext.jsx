@@ -39,9 +39,7 @@ export function AuthProvider({children}) {
             await http.client.put('users/me', {
                 firstName: newFirstName,
                 lastName: newLastName,
-                color: {
-                    color: newColor
-                }
+                color: newColor
             });
             setFirstName(newFirstName);
             setLastName(newLastName);
