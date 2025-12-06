@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,5 +25,5 @@ public class EventOwner {
     private UUID id;
 
     @OneToMany(mappedBy = "eventOwner", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Event> events = new ArrayList<>();
+    private List<@Valid Event> events = new ArrayList<>();
 }

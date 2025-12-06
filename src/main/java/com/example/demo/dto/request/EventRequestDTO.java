@@ -1,6 +1,7 @@
 package com.example.demo.dto.request;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.time.Instant;
 @Setter
 @AllArgsConstructor
 public class EventRequestDTO {
-    @NotNull
+    @NotBlank
     private String title;
     @NotNull
     private String description;

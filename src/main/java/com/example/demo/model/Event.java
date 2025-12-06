@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,23 @@ public class Event {
     @GeneratedValue
     private UUID id;
 
+    @ManyToOne(optional = false)
+    @JoinColumn
+    private EventOwner eventOwner;
+
+    @Column(nullable = false)
+    @NotBlank
+    private String title;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private Instant startTime;
+
+    @Column(nullable = false)
+    private Instant endTime;
+
     public Event(EventOwner eventOwner, String title, String description, Instant startTime, Instant endTime) {
         this.eventOwner = eventOwner;
         this.title = title;
@@ -38,20 +56,4 @@ public class Event {
         this.startTime = startTime;
         this.endTime = endTime;
     }
-
-    @ManyToOne(optional = false)
-    @JoinColumn
-    private EventOwner eventOwner;
-
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
-    private Instant startTime;
-
-    @Column(nullable = false)
-    private Instant endTime;
 }

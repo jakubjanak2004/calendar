@@ -5,9 +5,11 @@ import com.example.demo.dto.request.LoginDTO;
 import com.example.demo.dto.request.SignUpDTO;
 import com.example.demo.dto.response.AuthResponseDTO;
 import com.example.demo.exception.UsernameAlreadyExistsException;
+import com.example.demo.mapper.ColorMapper;
 import com.example.demo.mapper.SignUpMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.repository.CalendarUserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,11 +23,13 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 @Transactional
 public class AuthService {
     private final AuthenticationManager authManager;
@@ -34,23 +38,25 @@ public class AuthService {
     private final JwtEncoder jwtEncoder;
     private final JwtProps jwtProps;
     private final SignUpMapper signUpMapper;
+    private final ColorMapper colorMapper;
 
-    public AuthResponseDTO login(LoginDTO loginDTO) {
+    public AuthResponseDTO login(@Valid LoginDTO loginDTO) {
         Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
 
         CalendarUser user = (CalendarUser) auth.getPrincipal();
         String token = generateToken(user);
+        // todo move this to mapper
         return new AuthResponseDTO(
                 user.getId(),
                 token,
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getColor()
+                colorMapper.toDTO(user.getColor())
         );
     }
 
-    public AuthResponseDTO signup(SignUpDTO signupDTO) {
+    public AuthResponseDTO signup(@Valid SignUpDTO signupDTO) {
         if (calendarUserRepository.existsByUsername(signupDTO.getUsername())) {
             throw new UsernameAlreadyExistsException("Username already taken");
         }
@@ -58,13 +64,14 @@ public class AuthService {
         CalendarUser calendarUser = signUpMapper.toEntity(signupDTO);
         calendarUserRepository.save(calendarUser);
         String token = generateToken(calendarUser);
+        // todo move this to mapper
         return new AuthResponseDTO(
                 calendarUser.getId(),
                 token,
                 calendarUser.getUsername(),
                 calendarUser.getFirstName(),
                 calendarUser.getLastName(),
-                calendarUser.getColor()
+                colorMapper.toDTO(calendarUser.getColor())
         );
     }
 

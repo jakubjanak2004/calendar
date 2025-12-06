@@ -3,6 +3,9 @@ package com.example.demo.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,20 +26,26 @@ public class CalendarUser extends EventOwner implements UserDetails {
     private List<GroupMembership> groupMembershipList = new ArrayList<>();
 
     @Column(nullable = false)
+    @NotBlank
+    @Size(max = 100)
     private String firstName;
 
     @Column(nullable = false)
+    @NotBlank
+    @Size(max = 100)
     private String lastName;
 
     @Column(nullable = false, unique = true)
+    @NotBlank
+    @Size(min = 5, max = 30)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
+    @Valid
     private Color color = new Color("#0650bc");
-
 
     public CalendarUser(String firstName, String lastName, String username, String password) {
         this.firstName = firstName;
