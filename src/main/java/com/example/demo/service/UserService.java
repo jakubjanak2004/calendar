@@ -4,7 +4,7 @@ import com.example.demo.dto.request.UpdateUserDTO;
 import com.example.demo.mapper.CalendarUserMapper;
 import com.example.demo.mapper.UpdateUserMapper;
 import com.example.demo.model.CalendarUser;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
 import jakarta.validation.Valid;
@@ -17,7 +17,6 @@ import com.example.demo.dto.response.CalendarUserDTO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -40,7 +39,6 @@ public class UserService {
         return groupMembershipRepository.existsByUserIdAndMembershipRoleIn(calendarUser.getId(), List.of(MembershipRole.INVITED));
     }
 
-    // todo add tests, determine if mapper is needed
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
     public CalendarUserDTO updateUser(String username, @Valid UpdateUserDTO updateUserDTO) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();

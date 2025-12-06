@@ -5,6 +5,7 @@ import com.example.demo.dto.response.EventDTO;
 import com.example.demo.mapper.EventMapper;
 import com.example.demo.mapper.EventRequestMapper;
 import com.example.demo.model.Event;
+import com.example.demo.model.EventOwner;
 import com.example.demo.repository.EventOwnerRepository;
 import com.example.demo.repository.EventRepository;
 import jakarta.validation.Valid;
@@ -44,9 +45,11 @@ public class EventService {
 
     @PreAuthorize("@eventSecurity.canEditEventOwner(#eventOwnerId, authentication)")
     public EventDTO createEvent(UUID eventOwnerId, @Valid EventRequestDTO eventRequestDTO) {
+        EventOwner owner = eventOwnerRepository.findById(eventOwnerId).orElseThrow();
         Event event = eventRequestMapper.toEntity(eventRequestDTO);
-        event.setEventOwner(eventOwnerRepository.findById(eventOwnerId).orElseThrow());
-        return eventMapper.toDTO(eventRepository.save(event));
+        event.setEventOwner(owner);
+        Event saved = eventRepository.save(event);
+        return eventMapper.toDTO(saved);
     }
 
     @PreAuthorize("@eventSecurity.isOwner(#eventId, authentication)")

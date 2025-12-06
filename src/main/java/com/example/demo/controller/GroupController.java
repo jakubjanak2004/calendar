@@ -4,7 +4,7 @@ import com.example.demo.dto.request.CreateGroupDTO;
 import com.example.demo.dto.response.CalendarUserDTO;
 import com.example.demo.dto.response.GroupCalendarUserDTO;
 import com.example.demo.dto.response.UserGroupDTO;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

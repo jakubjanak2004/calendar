@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.example.demo.enumeration.MembershipRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,6 +46,7 @@ public class GroupMembership {
     private UserGroup group;
 
     @Column(nullable = false)
+    @Valid
     private Color color = new Color("#bada55");
 
     @Enumerated(EnumType.STRING)

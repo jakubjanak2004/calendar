@@ -16,6 +16,7 @@ export function Dashboard() {
         const res = await http.client.get('groupMemberships/me')
         const data = res.data.map(membership => {
             membership.canManage = membership.membershipRole === "ADMIN" || membership.membershipRole === "EDITOR";
+            membership.id = membership.groupId
             return membership
         })
         setEventOwners([{

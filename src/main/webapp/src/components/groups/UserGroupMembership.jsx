@@ -14,9 +14,7 @@ export default function UserGroupMembership({groupMembership}) {
     }
 
     async function handleColorBlur() {
-        await http.client.put(`groupMemberships/${groupId}/me/color`, {
-            color: color,
-        })
+        await http.client.put(`groupMemberships/${groupId}/me/color`, color)
     }
 
     return <>

@@ -1,6 +1,6 @@
 package com.example.demo.dto.response;
 
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

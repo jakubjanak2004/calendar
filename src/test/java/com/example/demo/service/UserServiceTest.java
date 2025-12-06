@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.SystemTest;
+import com.example.demo.dto.ColorDTO;
 import com.example.demo.dto.request.UpdateUserDTO;
 import com.example.demo.dto.response.CalendarUserDTO;
+import com.example.demo.mapper.ColorMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.Color;
 import com.example.demo.model.UserGroup;
@@ -25,12 +27,14 @@ import java.util.UUID;
 public class UserServiceTest extends SystemTest {
     private final CalendarUserRepository userRepository;
     private final UserService userService;
+    private final ColorMapper colorMapper;
 
     @Autowired
-    public UserServiceTest(Generator generator, CalendarUserRepository userRepository, UserService userService, CalendarUserRepository calendarUserRepository, UserGroupRepository userGroupRepository) {
+    public UserServiceTest(Generator generator, CalendarUserRepository userRepository, UserService userService, CalendarUserRepository calendarUserRepository, UserGroupRepository userGroupRepository, ColorMapper colorMapper) {
         super(calendarUserRepository, userGroupRepository, generator);
         this.userRepository = userRepository;
         this.userService = userService;
+        this.colorMapper = colorMapper;
     }
 
     @Test
@@ -80,7 +84,7 @@ public class UserServiceTest extends SystemTest {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO(
                 "Updated first name",
                 "Updated last name",
-                new Color()
+                ColorDTO.RED
         );
         Assertions.assertThrows(AuthorizationDeniedException.class, () -> userService.updateUser(testUser.getUsername(), updateUserDTO));
     }
@@ -91,7 +95,7 @@ public class UserServiceTest extends SystemTest {
         UpdateUserDTO updateUserDTO = new UpdateUserDTO(
                 "Updated first name",
                 "Updated last name",
-                new Color()
+                ColorDTO.RED
         );
         Assertions.assertThrows(AuthorizationDeniedException.class, () -> userService.updateUser("non existing username", updateUserDTO));
     }
@@ -101,7 +105,7 @@ public class UserServiceTest extends SystemTest {
     public void updateUserUpdatesUser() {
         String newFirstName = "Updated first name";
         String newLastName = "Updated last name";
-        Color newColor = new Color();
+        ColorDTO newColor = ColorDTO.RED;
         UpdateUserDTO updateUserDTO = new UpdateUserDTO(
                 newFirstName,
                 newLastName,
@@ -112,6 +116,6 @@ public class UserServiceTest extends SystemTest {
         Assertions.assertEquals(calendarUser.getId(), updatedUser.getId());
         Assertions.assertEquals(newFirstName, updatedUser.getFirstName());
         Assertions.assertEquals(newLastName, updatedUser.getLastName());
-        Assertions.assertEquals(newColor, updatedUser.getColor());
+        Assertions.assertEquals(newColor.getColor(), updatedUser.getColor().getColor());
     }
 }

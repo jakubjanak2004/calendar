@@ -1,19 +1,19 @@
 package com.example.demo.service;
 
 import com.example.demo.SystemTest;
+import com.example.demo.dto.ColorDTO;
 import com.example.demo.dto.request.ChangeMembershipRoleDTO;
 import com.example.demo.dto.response.GroupMembershipDTO;
+import com.example.demo.mapper.ColorMapper;
 import com.example.demo.model.CalendarUser;
-import com.example.demo.model.Color;
 import com.example.demo.model.GroupMembership;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.model.UserGroup;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
 import com.example.demo.repository.UserGroupRepository;
 import com.example.demo.service.utils.Generator;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +28,7 @@ import java.util.UUID;
 public class GroupMembershipTest extends SystemTest {
     private final GroupMembershipService groupMembershipService;
     private final GroupMembershipRepository groupMembershipRepository;
+    private final ColorMapper colorMapper;
 
 
     @Autowired
@@ -35,10 +36,11 @@ public class GroupMembershipTest extends SystemTest {
                                Generator generator,
                                GroupMembershipService groupMembershipService,
                                UserGroupRepository userGroupRepository,
-                               GroupMembershipRepository groupMembershipRepository) {
+                               GroupMembershipRepository groupMembershipRepository, ColorMapper colorMapper) {
         super(calendarUserRepository, userGroupRepository, generator);
         this.groupMembershipService = groupMembershipService;
         this.groupMembershipRepository = groupMembershipRepository;
+        this.colorMapper = colorMapper;
     }
 
     @Test
@@ -135,7 +137,7 @@ public class GroupMembershipTest extends SystemTest {
         );
 
         Assertions.assertNotNull(dto);
-        Assertions.assertEquals(userGroup.getId(), dto.getId());
+        Assertions.assertEquals(userGroup.getId(), dto.getGroupId());
     }
 
     @Test
@@ -144,7 +146,7 @@ public class GroupMembershipTest extends SystemTest {
         CalendarUser otherUser = generator.createUser();
         Assertions.assertThrows(AuthorizationDeniedException.class,
                 () -> groupMembershipService.updateMembershipColorForGroupAndUser(
-                        Color.RED,
+                        ColorDTO.RED,
                         userGroup.getId(),
                         otherUser.getUsername()
                 ));
@@ -155,7 +157,7 @@ public class GroupMembershipTest extends SystemTest {
     public void updateMembershipColorForGroupAndUserThrowsAuthorizationDeniedExceptionExceptionWhenUserDoesNotExist() {
         Assertions.assertThrows(AuthorizationDeniedException.class,
                 () -> groupMembershipService.updateMembershipColorForGroupAndUser(
-                        Color.RED,
+                        ColorDTO.RED,
                         userGroup.getId(),
                         "non existing username"
                 ));
@@ -165,7 +167,7 @@ public class GroupMembershipTest extends SystemTest {
     @WithMockUser(username = EVENT_OWNER_USERNAME)
     public void updateMembershipColorForGroupAndUserUpdatesColor() {
         groupMembershipService.updateMembershipColorForGroupAndUser(
-                Color.RED,
+                ColorDTO.RED,
                 userGroup.getId(),
                 calendarUser.getUsername()
         );
@@ -174,7 +176,7 @@ public class GroupMembershipTest extends SystemTest {
                 .findByGroupAndUser(userGroup, calendarUser)
                 .orElseThrow();
 
-        Assertions.assertEquals(Color.RED, membership.getColor());
+        Assertions.assertEquals(ColorDTO.RED.getColor(), membership.getColor().getColor());
     }
 
     @Test

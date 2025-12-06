@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 public interface UserGroupRepository extends JpaRepository<UserGroup, UUID> {
+    // todo I dont like how complicated this is, refactor
     @Query(
             value = """
             select distinct g

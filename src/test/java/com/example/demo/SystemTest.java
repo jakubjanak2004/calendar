@@ -24,8 +24,8 @@ import java.util.List;
 @WithMockUser
 @Import({EventServiceTest.MethodSec.class, EventSecurity.class})
 public abstract class SystemTest {
-    protected static final String EVENT_OWNER_USERNAME = "test";
-    protected static final String EVENT_OWNER_PASSWORD = "testPassword";
+    protected static final String EVENT_OWNER_USERNAME = "test_username";
+    protected static final String EVENT_OWNER_PASSWORD = "test_password";
     protected final CalendarUserRepository calendarUserRepository;
     protected final UserGroupRepository userGroupRepository;
     protected final Generator generator;

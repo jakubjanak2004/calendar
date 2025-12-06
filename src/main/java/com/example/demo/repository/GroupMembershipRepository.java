@@ -2,7 +2,7 @@ package com.example.demo.repository;
 
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.GroupMembership;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.model.UserGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +23,6 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     Optional<GroupMembership> findGroupMembershipByGroupAndUser(UserGroup group, CalendarUser user);
 
     List<GroupMembership> findAllByGroupAndMembershipRoleNot(UserGroup group, MembershipRole role);
-
-    List<GroupMembership> findAllByGroupAndUserNotAndMembershipRoleNot(UserGroup group, CalendarUser exceptUser, MembershipRole role);
 
     List<GroupMembership> findAllByGroupAndMembershipRole(UserGroup userGroup, MembershipRole membershipRole);
 

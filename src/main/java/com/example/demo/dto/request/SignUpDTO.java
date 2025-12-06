@@ -2,7 +2,6 @@ package com.example.demo.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,18 +11,18 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SignUpDTO {
     @NotBlank
-    @Size(max=100)
+    @Size(max = 100)
     private String firstName;
 
     @NotBlank
-    @Size(max=100)
+    @Size(max = 100)
     private String lastName;
 
     @NotBlank
-    @Size(min=5, max=20)
+    @Size(min = 5, max = 30)
     private String username;
 
     @NotBlank
-    @Size(min=5, max=50)
+    @Size(min = 5, max = 50)
     private String password;
 }

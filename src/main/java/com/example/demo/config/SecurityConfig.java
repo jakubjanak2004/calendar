@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final JwtProps jwtProps;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -62,23 +62,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecretKey jwtSecret() {
+    public SecretKey jwtSecret() {
         byte[] keyBytes = Base64.getDecoder().decode(jwtProps.secretB64());
         return new SecretKeySpec(keyBytes, jwtProps.algo());
     }
 
     @Bean
-    JwtDecoder jwtDecoder(SecretKey key) {
+    public JwtDecoder jwtDecoder(SecretKey key) {
         return NimbusJwtDecoder.withSecretKey(key).build();
     }
 
     @Bean
-    JwtEncoder jwtEncoder(SecretKey key) {
+    public JwtEncoder jwtEncoder(SecretKey key) {
         return new NimbusJwtEncoder(new ImmutableSecret<>(key));
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

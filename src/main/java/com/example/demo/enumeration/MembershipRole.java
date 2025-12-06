@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.demo.enumeration;
 
 public enum MembershipRole {
     MEMBER, EDITOR, ADMIN, INVITED

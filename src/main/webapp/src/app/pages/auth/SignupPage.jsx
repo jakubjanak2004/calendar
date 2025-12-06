@@ -75,15 +75,15 @@ export function SignupPage() {
             firstName: data.firstName,
             lastName: data.lastName,
             username: data.username,
-            password: data.password
+            password: data.password,
         });
         const token = res.data.token;
         const userId = res.data.userId;
         const username = res.data.username;
         const firstName = res.data.firstName;
-        const lastName = res.data.lastName
-        const color = res.data.color
-        login(token, userId, username, firstName, lastName, color.color)
+        const lastName = res.data.lastName;
+        const color = res.data.color;
+        login(token, userId, username, firstName, lastName, color.color);
         reset();
         navigate("/", { replace: true });
     }
@@ -93,11 +93,11 @@ export function SignupPage() {
             <header><Link to="/login">Log In</Link></header>
             <h1 className="main-header">Signup page</h1>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="auth-form" noValidate>
-                <input type="text" placeholder="first name" {...register("firstName")} autoFocus/>
+            <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+                <input type="text" placeholder="first name" {...register("firstName")} autoFocus required/>
                 {errors.firstName && <p role="alert">{errors.firstName.message}</p>}
 
-                <input type="text" placeholder="last name" {...register("lastName")} />
+                <input type="text" placeholder="last name" {...register("lastName")} required/>
                 {errors.lastName && <p role="alert">{errors.lastName.message}</p>}
 
                 <input
@@ -109,6 +109,7 @@ export function SignupPage() {
                         usernameReg.onBlur(e)
                         trigger("username")
                     }}
+                    required
                 />
                 {errors.username && <p role="alert">{errors.username.message}</p>}
 
@@ -117,6 +118,7 @@ export function SignupPage() {
                     placeholder="password"
                     autoComplete="new-password"
                     {...register("password")}
+                    required
                 />
                 {errors.password && <p role="alert">{errors.password.message}</p>}
 
@@ -125,6 +127,7 @@ export function SignupPage() {
                     placeholder="repeat password"
                     autoComplete="new-password"
                     {...register("passwordRepeat")}
+                    required
                 />
                 {errors.passwordRepeat && <p role="alert">{errors.passwordRepeat.message}</p>}
 

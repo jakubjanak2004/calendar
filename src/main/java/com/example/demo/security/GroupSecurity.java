@@ -2,7 +2,7 @@ package com.example.demo.security;
 
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.GroupMembership;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.model.UserGroup;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;

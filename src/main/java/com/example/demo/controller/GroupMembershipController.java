@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ColorDTO;
 import com.example.demo.dto.request.ChangeMembershipRoleDTO;
 import com.example.demo.dto.response.GroupMembershipDTO;
-import com.example.demo.model.Color;
 import com.example.demo.service.GroupMembershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,8 +41,8 @@ public class GroupMembershipController {
     }
 
     @PutMapping("/{groupId}/me/color")
-    public ResponseEntity<GroupMembershipDTO> updateGroupMembershipColor(@PathVariable UUID groupId, @RequestBody Color color, Principal principal) {
-        return ResponseEntity.ok(groupMembershipService.updateMembershipColorForGroupAndUser(color, groupId, principal.getName()));
+    public ResponseEntity<GroupMembershipDTO> updateGroupMembershipColor(@PathVariable UUID groupId, @RequestBody ColorDTO colorDTO, Principal principal) {
+        return ResponseEntity.ok(groupMembershipService.updateMembershipColorForGroupAndUser(colorDTO, groupId, principal.getName()));
     }
 
     @PutMapping("/{groupId}/users/{userId}")

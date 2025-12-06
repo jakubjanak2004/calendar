@@ -1,12 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.ColorDTO;
 import com.example.demo.dto.request.ChangeMembershipRoleDTO;
 import com.example.demo.dto.response.GroupMembershipDTO;
+import com.example.demo.mapper.ColorMapper;
 import com.example.demo.mapper.GroupMembershipMapper;
 import com.example.demo.model.CalendarUser;
 import com.example.demo.model.Color;
 import com.example.demo.model.GroupMembership;
-import com.example.demo.model.MembershipRole;
+import com.example.demo.enumeration.MembershipRole;
 import com.example.demo.model.UserGroup;
 import com.example.demo.repository.CalendarUserRepository;
 import com.example.demo.repository.GroupMembershipRepository;
@@ -32,6 +34,7 @@ public class GroupMembershipService {
     private final CalendarUserRepository calendarUserRepository;
     private final GroupMembershipMapper groupMembershipMapper;
     private final UserGroupRepository userGroupRepository;
+    private final ColorMapper colorMapper;
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
     public List<GroupMembershipDTO> getAllMembershipsForUser(String username) {
@@ -59,9 +62,10 @@ public class GroupMembershipService {
     }
 
     @PreAuthorize("@userSecurity.isUser(#username, authentication)")
-    public GroupMembershipDTO updateMembershipColorForGroupAndUser(@Valid Color color, UUID groupId, String username) {
+    public GroupMembershipDTO updateMembershipColorForGroupAndUser(@Valid ColorDTO colorDTO, UUID groupId, String username) {
         CalendarUser calendarUser = calendarUserRepository.findByUsername(username).orElseThrow();
         UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
+        Color color = colorMapper.toEntity(colorDTO);
         // todo think about fetching with condition not invited here
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();
         groupMembership.setColor(color);
@@ -71,7 +75,7 @@ public class GroupMembershipService {
 
 
     @PreAuthorize("@groupSecurity.canManageGroupMembers(#groupId, authentication)")
-    public void updateMembershipRoleForGroupAndUser(UUID groupId, UUID userId, ChangeMembershipRoleDTO changeMembershipRoleDTO) {
+    public void updateMembershipRoleForGroupAndUser(UUID groupId, UUID userId, @Valid ChangeMembershipRoleDTO changeMembershipRoleDTO) {
         UserGroup userGroup = userGroupRepository.findById(groupId).orElseThrow();
         CalendarUser calendarUser = calendarUserRepository.findById(userId).orElseThrow();
         GroupMembership groupMembership = groupMembershipRepository.findByGroupAndUser(userGroup, calendarUser).orElseThrow();

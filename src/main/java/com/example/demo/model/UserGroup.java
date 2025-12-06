@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
+import com.example.demo.enumeration.MembershipRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -13,19 +15,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class UserGroup extends EventOwner {
+    @Getter
     @Size(min = 1, message = "Group must have at least one member")
     @OneToMany(mappedBy = "group", orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    private List<GroupMembership> groupMembershipList = new ArrayList<>();
+    // todo think about changing this to a Map<String, GroupMembership> where the key is the username of the user in membership
+    private List<@Valid GroupMembership> groupMembershipList = new ArrayList<>();
 
     @NotBlank
     @Column(nullable = false)
