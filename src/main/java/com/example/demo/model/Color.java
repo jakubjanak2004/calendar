@@ -13,7 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Embeddable
 public class Color {
-    public static final Color RED = new Color("#ff0000");
     @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "Color must be in hex format, e.g. #RRGGBB")
     private String color;
 
