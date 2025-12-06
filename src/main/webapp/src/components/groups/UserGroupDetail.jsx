@@ -8,17 +8,11 @@ export default function UserGroupDetail() {
     const {groupId} = useParams();
     const [group, setGroup] = useState({})
     const [groupMemberships, setGroupMemberships] = useState([])
-    const [groupMembers, setGroupMembers] = useState([])
     const [userRole, setUserRole] = useState("")
     const navigate = useNavigate()
 
     const canAddEvents = userRole === "EDITOR" || userRole === "ADMIN";
     const canManageMembership = userRole === "ADMIN";
-
-    async function getGroupMembers() {
-        let res = await http.client.get(`groups/${groupId}/users`)
-        setGroupMembers(res.data)
-    }
 
     async function getUserRole() {
         const res = await http.client.get(`groups/${groupId}/users/me/membershipRole`)
@@ -26,13 +20,14 @@ export default function UserGroupDetail() {
     }
 
     async function fetchGroupAndMembership() {
-        const res = await http.client.get(`groups/${groupId}`)
+        const groupInfo = await http.client.get(`groups/${groupId}`)
         const membershipInfo = await http.client.get(`groupMemberships/${groupId}/me`)
-        const membership = membershipInfo.data
-        setGroup(res.data)
+        const group = groupInfo.data;
+        const membership = membershipInfo.data;
+        setGroup(group);
         membership.canManage = membership.membershipRole === "ADMIN" || membership.membershipRole === "EDITOR";
-        membership.id = membership.groupId
-        setGroupMemberships([membership])
+        membership.id = membership.groupId;
+        setGroupMemberships([membership]);
     }
 
     async function leaveGroup() {
@@ -43,7 +38,6 @@ export default function UserGroupDetail() {
     }
 
     useEffect(() => {
-        getGroupMembers().finally()
         getUserRole().finally()
     }, [groupId]);
 

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {http} from "../../lib/http.jsx";
+import {useEvents} from "../../context/EventContext.jsx";
 
 function toLocalInputValue(date) {
     const pad = n => String(n).padStart(2, "0");
@@ -15,8 +15,9 @@ function toLocalInputValue(date) {
 const toIso = (local) => new Date(local).toISOString();
 
 export default function EventForm({onSubmitCallback, eventId, submitButtonValue, defaultStartTime, defaultEndTime}) {
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
+    const {findEventById} = useEvents();
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [startTime, setStartTime] = useState(toLocalInputValue(defaultStartTime || new Date()));
     const [endTime, setEndTime] = useState(toLocalInputValue(defaultEndTime || new Date()));
 
@@ -25,14 +26,12 @@ export default function EventForm({onSubmitCallback, eventId, submitButtonValue,
         onSubmitCallback(title, description, toIso(startTime), toIso(endTime))
     }
 
-    // todo determine if loading the event is necessary, it would be better to load it from local event store
     async function loadEvent() {
-        const res = await http.client.get(`events/${eventId}`)
-        const data = res.data
-        setTitle(data.title)
-        setDescription(data.description)
-        setStartTime(toLocalInputValue(new Date(data.startTime)))
-        setEndTime(toLocalInputValue(new Date(data.endTime)))
+        const event = findEventById(eventId);
+        setTitle(event.title)
+        setDescription(event.description)
+        setStartTime(toLocalInputValue(new Date(event.startTime)))
+        setEndTime(toLocalInputValue(new Date(event.endTime)))
     }
 
     useEffect(() => {

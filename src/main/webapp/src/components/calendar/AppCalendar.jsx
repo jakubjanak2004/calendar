@@ -28,7 +28,7 @@ function darkenHex(hex, amount) {
 
 // todo refactor the logic here as it got a bit too messy, maybe instead of membership role use can edit event boolean
 export default function AppCalendar({memberships, canAddEvents}) {
-    const {setEventsForOwner, eventsByOwner} = useEvents();
+    const {setEventsForOwner, eventsByOwner , getEventsForOwner} = useEvents();
     const [date, setDate] = useState(() => new Date());
     const [view, setView] = useState(Views.MONTH);
     const navigate = useNavigate()
@@ -38,7 +38,7 @@ export default function AppCalendar({memberships, canAddEvents}) {
         const all = [];
 
         for (let calendarOwner of memberships) {
-            const ownerEvents = eventsByOwner[calendarOwner.id] || {};
+            const ownerEvents = getEventsForOwner(calendarOwner.id);
             const ownerEventsArray = Object.values(ownerEvents).map(e => {
                 const color = calendarOwner.color;
                 return {
@@ -82,7 +82,7 @@ export default function AppCalendar({memberships, canAddEvents}) {
         }
     }, [firstOwnerId, date]);
 
-    const handleNavigate = (newDate) => {
+    const handleDateChanged = (newDate) => {
         setDate(newDate);
     };
 
@@ -151,7 +151,7 @@ export default function AppCalendar({memberships, canAddEvents}) {
             timeslots={1}
             date={date}
             view={view}
-            onNavigate={handleNavigate}
+            onNavigate={handleDateChanged}
             onView={handleViewChange}
             views={[Views.MONTH, Views.WEEK, Views.DAY]}
             startAccessor="start"

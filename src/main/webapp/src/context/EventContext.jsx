@@ -6,6 +6,19 @@ const EventContext = createContext(null);
 export function EventProvider({children}) {
     const [eventsByOwner, setEventsByOwner] = useState({});
 
+    function findEventById(eventId) {
+        for (const ownerId of Object.keys(eventsByOwner)) {
+            const event = eventsByOwner[ownerId]?.[eventId];
+            if (event) return event;
+        }
+        return null;
+    }
+
+    function getEventsForOwner(ownerId) {
+        const ownerEvents = eventsByOwner[ownerId] || {};
+        return Object.values(ownerEvents);
+    }
+
     function setEventsForOwner(ownerId, events) {
         setEventsByOwner(prev => ({
             ...prev,
@@ -65,7 +78,7 @@ export function EventProvider({children}) {
     }
 
     return <EventContext.Provider
-        value={{eventsByOwner, setEventsForOwner, addEventsForOwner, updateEvent, removeEventForOwner}}
+        value={{eventsByOwner, getEventsForOwner, setEventsForOwner, addEventsForOwner, updateEvent, removeEventForOwner, findEventById}}
     >
         {children}
     </EventContext.Provider>
